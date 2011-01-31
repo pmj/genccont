@@ -48,12 +48,13 @@ struct int_list
 struct slist_head* setup_test_list()
 {
 	struct slist_head* head = NULL;
+	struct slist_head** tail = &head;
 	int i;
 	for (i = 0; i < 10; ++i)
 	{
 		struct int_list* e = calloc(1, sizeof(struct int_list));
 		e->val = i;
-		genc_slist_insert_at(&e->head, &head);
+		tail = genc_slist_insert_at(&e->head, tail);
 	}
 	return head;
 }
@@ -81,9 +82,10 @@ int main()
 	assert(genc_container_of(pca, const struct B, a) == &cb);
 	
 	struct slist_head* list = setup_test_list();
+	struct slist_head** pos = &list;
 	
 	// iteration
-	genc_slist_for_each(cur, list, struct int_list, head)
+	genc_slist_for_each_ref(cur, pos, struct int_list, head)
 	{
 		printf("%p: %d\n", cur, cur->val);
 	}

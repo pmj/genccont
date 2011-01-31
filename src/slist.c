@@ -44,10 +44,11 @@ struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_en
 	return *genc_slist_find_entry_ref(&start, pred);
 }
 
-void genc_slist_insert_at(struct slist_head* new_entry, struct slist_head** at)
+struct slist_head** genc_slist_insert_at(struct slist_head* new_entry, struct slist_head** at)
 {
 	new_entry->next = *at;
 	*at = new_entry;
+	return &new_entry->next;
 }
 
 void genc_slist_insert_after(struct slist_head* new_entry, struct slist_head* after_entry)

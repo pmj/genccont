@@ -72,9 +72,10 @@ struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_en
 struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_slist_entry_pred_fn pred);
 
 /** Inserts a single new list element at the given position.
- * The 'at' argument can be a pointer to the head of the list or to a 'next' field
+ * The 'at' argument can be a pointer to the head of the list or to a 'next' field.
+ * Returns the pointer to the 'next' field of the inserted element, usable for further insertions.
  */
-void genc_slist_insert_at(struct slist_head* new_entry, struct slist_head** at);
+struct slist_head** genc_slist_insert_at(struct slist_head* new_entry, struct slist_head** at);
 
 /** Inserts a single new list element after an existing entry.
  */
@@ -110,7 +111,13 @@ struct slist_head* genc_slist_remove_after(struct slist_head* after_entry);
 
 
 
-/* similar to Linux's container_of macro, except it also handles NULL pointers
+/** genc_container_of(obj, cont_type, member_name)
+ * Get pointer to struct object from a pointer to one of its members.
+ * obj - pointer to a struct member, or NULL
+ * cont_type - structure type of the containing object
+ * member_name - name of the member of cont_type referenced by obj
+ *
+ * Similar to Linux's container_of macro, except it also handles NULL pointers
  * correctly, which is to say it evaluates to NULL when the obj is NULL. We also
  * try to support non-GCC compilers which don't support the ({ }) expression
  * syntax.
@@ -128,7 +135,7 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 #endif
 
 
-/* Get next list item with appropriate type.
+/** Get next list item with appropriate type.
  */
 #define genc_slist_next(cur, list_type, list_head_member_name) \
 genc_container_of((cur)->list_head_member_name.next, list_type, list_head_member_name)
@@ -138,7 +145,7 @@ genc_container_of((cur)->list_head_member_name.next, list_type, list_head_member
  * struct my_list* next = genc_slist_next(p, struct my_list, list_head);
  */
 
-/* Iterate through (the rest of) a list with a for() loop.
+/** Iterate through (the rest of) a list with a for() loop.
  * genc_slist_for_each(loop_var, list_head, list_type, list_head_member_name)
  * loop_var - the "running" loop variable, must be declared as list_type* outside the loop
  * 
@@ -156,7 +163,42 @@ for (loop_var = genc_container_of((list_head), list_type, list_head_member_name)
  * }
  */
 
-/* genc_slist_remove_object_at(at, list_type)
+
+/** Iterate through (the rest of) a list with a for() loop while also tracking
+ * the last link followed to arrive at the current element. This allows
+ * insertion/removal at the current position.
+ * genc_slist_for_each(loop_var, list_head_ref, list_type, list_head_member_name)
+ * loop_var - the "running" loop variable, must be declared as list_type* outside the loop
+ * list_head_ref - lvalue of type struct slist_head**. Must be initialised to address of
+ * head of the list or 'next' pointer which to follow first. Will be updated to the followed
+ * link on every iteration.
+ *
+ * Note that (*list_head_ref)->next is follewed for the next iteration, so after
+ * inserting, you may wish to update list_head_ref to avoid running the loop body
+ * more than once for the same element:
+ * list_head_ref = genc_slist_insert_at(&new_entry->list_head, list_head_ref);
+ *
+ * You may safely break out of this loop or use the 'continue' statement.
+ */
+#define genc_slist_for_each_ref(loop_var, list_head_ref, list_type, list_head_member_name) \
+for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); loop_var != NULL; (list_head_ref = &(*list_head_ref)->next), (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name)))
+
+/* Example:
+ * Insert an element before each existing element.
+ *
+ * struct my_list* cur = NULL;
+ * struct slist_head* head = setup_test_list();
+ * struct slist_head** pos = &head;
+ * genc_slist_for_each(cur, pos, struct my_list, list_head)
+ * {
+ *   struct my_list* new_dbl = calloc(1, sizeof(struct my_list));
+ *   new_dbl->data1 = cur->data1 * 2;
+ *   pos = genc_slist_insert_at(&new_dbl->list_head, pos);
+ * }
+ */
+
+
+/** genc_slist_remove_object_at(at, list_type)
  * Typed version of genc_slist_remove_at(). */
 #define genc_slist_remove_object_at(at, list_type, list_head_member_name) \
 genc_container_of(genc_slist_remove_at(at), list_type, list_head_member_name)

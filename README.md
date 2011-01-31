@@ -1,4 +1,4 @@
-= GenCCont: Generic C Containers =
+# GenCCont: Generic C Containers #
 
 While working on a kernel-mode driver, I needed a simple, compact, singly-linked
 list that had no dependencies I couldn't satisfy in kernel space. Surprisingly,

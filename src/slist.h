@@ -24,6 +24,22 @@ freely, subject to the following restrictions:
 #ifndef GENCCONT_SLIST_H
 #define GENCCONT_SLIST_H
 
+/* for standard C typedefs, NULL, offsetof(), etc. */
+#if defined(LINUX) && defined(__KERNEL__)
+/* compiling the linux kernel (or rather a module) */
+#include <linux/types.h>
+#include <linux/stddef.h>
+#elif defined(KERNEL) && defined(APPLE)
+/* xnu kernel */
+#include <IOKit/IOTypes.h>
+/* xnu for some reason doesn't typedef ptrdiff_t. To avoid stepping on toes,
+ * we'll temporarily re-#define it in case another header sets it */
+#define ptrdiff_t __darwin_ptrdiff_t
+#else
+/* assume libc is available */
+#include <stddef.h>
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,14 +108,14 @@ struct slist_head* genc_slist_remove_after(struct slist_head* after_entry);
  * };
  */
 
+
+
 /* similar to Linux's container_of macro, except it also handles NULL pointers
- * correctly, which is to say it evaluates to NULL when the obj is NULL.
+ * correctly, which is to say it evaluates to NULL when the obj is NULL. We also
+ * try to support non-GCC compilers which don't support the ({ }) expression
+ * syntax.
  */ 
 #ifndef genc_container_of
-
-#ifndef offsetof
-#include <stddef.h>
-#endif
 
 /* function for avoiding multiple evaluation */
 static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
@@ -171,5 +187,10 @@ for ((removed_element = genc_slist_remove_object_at((list_head), list_type, list
  *   }
  * }
  */
+
+
+#if defined(KERNEL) && defined(APPLE)
+#undef ptrdiff_t
+#endif
 
 #endif

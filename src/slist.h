@@ -170,8 +170,5 @@ for ((removed_element = genc_slist_remove_object_at((list_head), list_type, list
  *     free(d);
  *   }
  */
-}
-
- */
 
 #endif

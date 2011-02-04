@@ -198,7 +198,7 @@ for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_
  */
 
 
-/** genc_slist_remove_object_at(at, list_type)
+/** genc_slist_remove_object_at(at, list_type, list_head_member_name)
  * Typed version of genc_slist_remove_at(). */
 #define genc_slist_remove_object_at(at, list_type, list_head_member_name) \
 genc_container_of(genc_slist_remove_at(at), list_type, list_head_member_name)

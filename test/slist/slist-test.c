@@ -68,6 +68,13 @@ void free_test_list(struct slist_head* l)
 	}
 }
 
+int list_entry_matches(struct slist_head* entry, void* data)
+{
+	struct int_list* e = genc_container_of(entry, struct int_list, head);
+	int* comp_ptr = data;
+	return e->val == *comp_ptr;
+}
+
 int main()
 {
 	// check container_of
@@ -83,12 +90,22 @@ int main()
 	
 	struct slist_head* list = setup_test_list();
 	struct slist_head** pos = &list;
+	struct int_list* list_ints = genc_container_of(list, struct int_list, head);
 	
 	// iteration
 	genc_slist_for_each_ref(cur, pos, struct int_list, head)
 	{
 		printf("%p: %d\n", cur, cur->val);
 	}
+	
+	int comp = 3;
+	cur = genc_slist_find_obj(list_ints, struct int_list, head, list_entry_matches, &comp);
+	assert(cur);
+	assert(cur->val == 3);
+	cur = genc_slist_find_obj(genc_slist_next(cur, struct int_list, head), struct int_list, head, list_entry_matches, &comp);
+	assert(!cur);
+	cur = genc_slist_find_obj(cur, struct int_list, head, list_entry_matches, &comp);
+	assert(!cur);
 	
 	free_test_list(list);
 	

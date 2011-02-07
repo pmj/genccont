@@ -54,12 +54,12 @@ struct slist_head
 	struct slist_head* next;
 };
 /* predicate function type for filtering list entries, returns 0 for no match, non-0 for match */
-typedef int (*genc_slist_entry_pred_fn)(struct slist_head* entry);
+typedef int (*genc_slist_entry_pred_fn)(struct slist_head* entry, void* data);
 
 /** Locates a specific list entry based on the given predicate function.
  * Returns a pointer to the first matched element, or NULL if none is found.
  */
-struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_entry_pred_fn pred);
+struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_entry_pred_fn pred, void* data);
 
 /** Locates a specific list entry based on the given predicate function.
  * Returns a pointer to the previous element's 'next' field or the list head,
@@ -69,7 +69,7 @@ struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_en
  * the list, or a new element inserted before it by altering the returned
  * pointer.
  */
-struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_slist_entry_pred_fn pred);
+struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_slist_entry_pred_fn pred, void* data);
 
 /** Inserts a single new list element at the given position.
  * The 'at' argument can be a pointer to the head of the list or to a 'next' field.
@@ -131,6 +131,11 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 }
 #define genc_container_of(obj, cont_type, member_name) \
 ((cont_type*)genc_container_of_helper(obj, offsetof(cont_type, member_name)))
+
+static inline void* genc_member_of_helper(const void* obj, ptrdiff_t offset)
+{
+	return obj ? ((char*)obj + offset) : NULL;
+}
 
 #endif
 
@@ -229,6 +234,15 @@ for ((removed_element = genc_slist_remove_object_at((list_head), list_type, list
  *   }
  * }
  */
+
+/** genc_slist_find_object(start_obj, list_type, list_head_member_name, pred, data)
+ * Typed version of genc_slist_find_entry 
+ * Locates a specific list entry based on the given predicate function.
+ * Returns a pointer to the first matched element, or NULL if none is found.
+ * start_obj may be NULL, in which case NULL is returned.
+ */
+#define genc_slist_find_obj(start, list_type, list_head_member_name, pred, data) \
+genc_container_of(genc_slist_find_entry(((struct slist_head*)genc_member_of_helper((start), offsetof(list_type, list_head_member_name))), pred, data), list_type, list_head_member_name)
 
 
 #if defined(KERNEL) && defined(APPLE)

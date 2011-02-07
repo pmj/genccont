@@ -25,12 +25,12 @@ freely, subject to the following restrictions:
 #include "slist.h"
 
 
-struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_slist_entry_pred_fn pred)
+struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_slist_entry_pred_fn pred, void* data)
 {
 	struct slist_head** cur = start;
 	while (*cur)
 	{
-		if (pred(*cur))
+		if (pred(*cur, data))
 		{
 			return cur;
 		}
@@ -39,9 +39,9 @@ struct slist_head** genc_slist_find_entry_ref(struct slist_head** start, genc_sl
 	return cur;
 }
 
-struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_entry_pred_fn pred)
+struct slist_head* genc_slist_find_entry(struct slist_head* start, genc_slist_entry_pred_fn pred, void* data)
 {
-	return *genc_slist_find_entry_ref(&start, pred);
+	return *genc_slist_find_entry_ref(&start, pred, data);
 }
 
 struct slist_head** genc_slist_insert_at(struct slist_head* new_entry, struct slist_head** at)

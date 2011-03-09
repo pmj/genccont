@@ -54,6 +54,9 @@ struct slist_head* genc_slq_pop_front(struct slist_queue* queue);
 /** Inserts the given at the front of the queue. */
 void genc_slq_push_front(struct slist_queue* queue, struct slist_head* new_item);
 
+/* returns 0 if queue contains one or more items, 1 if empty */
+int genc_slq_is_empty(struct slist_queue* queue);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

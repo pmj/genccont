@@ -40,3 +40,7 @@ struct slist_head* genc_slq_pop_front(struct slist_queue* queue)
 	return removed;
 }
 
+int genc_slq_is_empty(struct slist_queue* queue)
+{
+	return !queue->head;
+}

@@ -48,7 +48,7 @@ void genc_slq_init(struct slist_queue* queue);
 /** Inserts the given item at the back of the queue. */
 void genc_slq_push_back(struct slist_queue* queue, struct slist_head* new_item);
 
-/** Pops an item off the front of the queue, returning it. */
+/** Pops an item off the front of the queue, returning it. NULL if queue is empty. */
 struct slist_head* genc_slq_pop_front(struct slist_queue* queue);
 
 /** Inserts the given at the front of the queue. */

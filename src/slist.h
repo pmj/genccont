@@ -137,7 +137,7 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 #define genc_container_of(obj, cont_type, member_name) \
 ({ \
 	cont_type* _c = ((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name))); \
-	typeof(obj) __attribute__ ((unused)) _p = &_c->member_name; \
+	typeof(obj) __attribute__ ((unused)) _p = _c ? &_c->member_name : NULL; \
 	_c; \
 	})
 #else

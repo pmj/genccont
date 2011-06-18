@@ -129,8 +129,21 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 {
 	return (obj ? ((char*)obj - offset) : NULL);
 }
+
+#ifdef __GNUC__
+
+/* the unused _p attribute is for causing a compiler warning if member_name of
+ * cont_type does not have same type as target of obj*/
 #define genc_container_of(obj, cont_type, member_name) \
-((cont_type*)genc_container_of_helper(obj, offsetof(cont_type, member_name)))
+({ \
+	cont_type* _c = ((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name))); \
+	typeof(obj) __attribute__ ((unused)) _p = &_c->member_name; \
+	_c; \
+	})
+#else
+#define genc_container_of(obj, cont_type, member_name) \
+((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name)))
+#endif
 
 static inline void* genc_member_of_helper(const void* obj, ptrdiff_t offset)
 {

@@ -74,3 +74,26 @@ struct slist_head* genc_slist_remove_after(struct slist_head* after_entry)
 	return genc_slist_remove_at(&after_entry->next);
 }
 
+struct slist_head** genc_slist_find_tail(struct slist_head** head)
+{
+	struct slist_head** cur = head;
+	while (*cur)
+	{
+		cur = &(*cur)->next;
+	}
+	return cur;
+}
+
+struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_head** from)
+{
+	struct slist_head** from_tail;
+	if (!*from)
+		return into;
+	
+	from_tail = genc_slist_find_tail(from);
+	*from_tail = *into;
+	*into = *from;
+	*from = NULL;
+	return from_tail;
+}
+

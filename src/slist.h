@@ -41,6 +41,15 @@ freely, subject to the following restrictions:
 #endif
 
 
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(__GNUC__) && (!defined(__STRICT_ANSI__) || !__STRICT_ANSI__))
+#define GENC_INLINE inline
+#elif (defined(__GNUC__) && defined(__STRICT_ANSI__) && __STRICT_ANSI__)
+#define GENC_INLINE __inline__
+#else
+#define GENC_INLINE
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -92,6 +101,10 @@ struct slist_head* genc_slist_remove_at(struct slist_head** at);
  */
 struct slist_head* genc_slist_remove_after(struct slist_head* after_entry);
 
+struct slist_head** genc_slist_find_tail(struct slist_head** head);
+
+struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_head** from);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
@@ -125,7 +138,7 @@ struct slist_head* genc_slist_remove_after(struct slist_head* after_entry);
 #ifndef genc_container_of
 
 /* function for avoiding multiple evaluation */
-static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
+static GENC_INLINE char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 {
 	return (obj ? ((char*)obj - offset) : NULL);
 }
@@ -137,7 +150,7 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 #define genc_container_of(obj, cont_type, member_name) \
 ({ \
 	cont_type* _c = ((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name))); \
-	typeof(obj) __attribute__ ((unused)) _p = _c ? &_c->member_name : NULL; \
+	__typeof__(obj) __attribute__ ((unused)) _p = _c ? &_c->member_name : NULL; \
 	_c; \
 	})
 #else
@@ -145,7 +158,7 @@ static inline char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 ((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name)))
 #endif
 
-static inline void* genc_member_of_helper(const void* obj, ptrdiff_t offset)
+static GENC_INLINE void* genc_member_of_helper(const void* obj, ptrdiff_t offset)
 {
 	return obj ? ((char*)obj + offset) : NULL;
 }
@@ -199,7 +212,7 @@ for (loop_var = genc_container_of((list_head), list_type, list_head_member_name)
  * You may safely break out of this loop or use the 'continue' statement.
  */
 #define genc_slist_for_each_ref(loop_var, list_head_ref, list_type, list_head_member_name) \
-for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); loop_var != NULL; (list_head_ref = &(*list_head_ref)->next), (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name)))
+for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); loop_var != NULL; (*list_head_ref) ? ((list_head_ref = &(*list_head_ref)->next), (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name))) : 0)
 
 /* Example:
  * Insert an element before each existing element.
@@ -214,6 +227,9 @@ for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_
  *   pos = genc_slist_insert_at(&new_dbl->list_head, pos);
  * }
  */
+
+#define genc_slist_for_each_head_ref(loop_var, list_head_ref) \
+for (loop_var = *list_head_ref; loop_var != NULL; (void)((*list_head_ref) ? ((list_head_ref = &(*list_head_ref)->next), (loop_var = *list_head_ref)) : 0))
 
 
 /** genc_slist_remove_object_at(at, list_type, list_head_member_name)

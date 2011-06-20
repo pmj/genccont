@@ -73,7 +73,11 @@ typedef int(*genc_chaining_hash_key_equality_fn)(void* key1, void* key2, void* o
 
 /* memory re-allocation function. Semantics similar to C's realloc(), copying allowed.
  * new_size = 0 frees memory
- * old_size = 0 allocates a new block */
+ * old_size = 0 allocates a new block.
+ * Additionally, if the table should have a fixed size, disable shrinking by
+ * setting the shrink threshold to 0 and prevent growing by returning NULL from
+ * the realloc function when old_size > 0 && new_size > 0. You're still expected
+ * to provide the initial memory. */
 typedef void*(*genc_realloc_fn)(void* old_ptr, size_t old_size, size_t new_size);
 
 struct genc_chaining_hash_table;

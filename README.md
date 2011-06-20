@@ -137,4 +137,6 @@ for details and examples.
 
 - Documentation for the `slist_queue` and the chained hash table.
 - Templated C++ wrappers where appropriate.
-
+- More data structures: e.g. doubly linked list and queue; hash tables with other
+memory layout and collision resolution strategies; trees; etc.
+- Wider testing (and support) of different platforms and compilers.

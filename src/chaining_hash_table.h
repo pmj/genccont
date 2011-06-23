@@ -127,7 +127,7 @@ struct slist_head* genc_cht_find(struct genc_chaining_hash_table* table, void* k
 
 /* Looks up the key in the table, returning the reference pointing to the
  * matching item, or something pointing to NULL if not found. The reference may be passed to
- * genc_cht_find_ref() for efficient removal. */
+ * genc_cht_remove_ref() for efficient removal. */
 struct slist_head** genc_cht_find_ref(struct genc_chaining_hash_table* table, void* key);
 
 /* Removes the item referred to by item_ref from the hash table, returning it.
@@ -177,6 +177,9 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#define genc_cht_find_obj(table, key, type, header_name) \
+genc_container_of(genc_cht_find((table), (key)), type, header_name)
 
 
 #if defined(KERNEL) && defined(APPLE)

@@ -182,7 +182,7 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 genc_container_of(genc_cht_find((table), (key)), type, header_name)
 
 #define genc_cht_for_each_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME) \
-for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR; \
+for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \
 	BUCKET_VAR < (TABLE)->capacity; \
 	++BUCKET_VAR, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR) \
 		genc_slist_for_each_ref(ENTRY_VAR, CUR_HEAD_PTR_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME)

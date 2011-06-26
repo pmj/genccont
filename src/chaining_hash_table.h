@@ -166,7 +166,7 @@ size_t genc_hash_uint32(uint32_t k);
 size_t genc_hash_uint64(uint64_t k);
 static GENC_INLINE size_t genc_hash_size(size_t k)
 {
-#ifdef __LP64__
+#if defined(__LP64__) || defined(_WIN64)
 	return genc_hash_uint64(k);
 #else
 	return genc_hash_uint32(k);
@@ -180,6 +180,12 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 
 #define genc_cht_find_obj(table, key, type, header_name) \
 genc_container_of(genc_cht_find((table), (key)), type, header_name)
+
+#define genc_cht_for_each_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME) \
+for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR; \
+	BUCKET_VAR < (TABLE)->capacity; \
+	++BUCKET_VAR, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR) \
+		genc_slist_for_each_ref(ENTRY_VAR, CUR_HEAD_PTR_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME)
 
 
 #if defined(KERNEL) && defined(APPLE)

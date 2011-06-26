@@ -74,8 +74,9 @@ int main()
 	unsigned key = 0;
 	int res = 0;
 	slist_head_t** ref = NULL;
-	size_t count = 0, capacity = 0;
+	size_t count = 0, capacity = 0, bucket = 0;
 	slist_head_t* removed = NULL;
+	struct test_entry* cur = NULL;
 	
 	genc_chaining_hash_table_init(&table, cht_test_hash, cht_test_get_key, cht_test_keys_equal, cht_test_realloc, NULL, 4);
 	
@@ -129,6 +130,17 @@ int main()
 	ref = genc_cht_find_ref(&table, &key);
 	assert(ref && !*ref);
 
+	/* test iteration */
+	count = 0;
+	res = 0;
+	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	{
+		++count;
+		res += cur->val;
+	}
+	assert(count == 5);
+	assert(res == 1500);
+
 	/* Test removal */
 	key = 3;
 	removed = genc_cht_remove(&table, &key);
@@ -177,6 +189,36 @@ int main()
 	genc_cht_grow_by(&table, 8);
 	capacity = genc_cht_capacity(&table);
 	assert(capacity == 8 * 256);
+
+
+	/* test iteration with removal */
+	count = 0;
+	res = 0;
+	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	{
+		++count;
+		if (cur->val % 200 == 0)
+		{
+			/* remove multiples of 200 (i.e. 200, 400) */
+			res += cur->val;
+			genc_cht_remove_ref(&table, ref);
+		}
+	}
+	assert(count == 5);
+	assert(res == 600);
+	count = genc_cht_count(&table);
+	assert(count == 3);
+
+	/* test remaining items */
+	count = 0;
+	res = 0;
+	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	{
+		++count;
+		res += cur->val;
+	}
+	assert(count == 3);
+	assert(res == 100 + 300 + 500);
 	
 	genc_cht_destroy(&table);
 	return 0;

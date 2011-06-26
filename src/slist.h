@@ -204,15 +204,23 @@ for (loop_var = genc_container_of((list_head), list_type, list_head_member_name)
  * head of the list or 'next' pointer which to follow first. Will be updated to the followed
  * link on every iteration.
  *
- * Note that (*list_head_ref)->next is follewed for the next iteration, so after
- * inserting, you may wish to update list_head_ref to avoid running the loop body
- * more than once for the same element:
+ * Note that (*list_head_ref)->next is follewed for the next iteration if
+ * loop_var is the same as the item referenced by (*list_head_ref); (*list_head_ref)
+ * itself will be the next element if it isn't (useful for avoiding skipping
+ * elements on removal).
+ * After inserting, you will therefore probably want to update list_head_ref to
+ * avoid running the loop body more than once for the same element:
  * list_head_ref = genc_slist_insert_at(&new_entry->list_head, list_head_ref);
  *
  * You may safely break out of this loop or use the 'continue' statement.
  */
 #define genc_slist_for_each_ref(loop_var, list_head_ref, list_type, list_head_member_name) \
-for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); loop_var != NULL; (*list_head_ref) ? ((list_head_ref = &(*list_head_ref)->next), (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name))) : 0)
+for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); \
+	*(list_head_ref) != NULL; \
+	(!*(list_head_ref) ? NULL : \
+		((genc_container_of(*(list_head_ref), list_type, list_head_member_name) == (loop_var)) ? \
+			((list_head_ref = &(*list_head_ref)->next)) : NULL), \
+			((loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name)))))
 
 /* Example:
  * Insert an element before each existing element.

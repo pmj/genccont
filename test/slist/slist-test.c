@@ -92,10 +92,14 @@ int main()
 	struct slist_head** pos = &list;
 	struct int_list* list_ints = genc_container_of(list, struct int_list, head);
 	
+	int num_iterations = 0;
 	// iteration
 	genc_slist_for_each_ref(cur, pos, struct int_list, head)
 	{
-		printf("%p: %d\n", cur, cur->val);
+		//printf("%p: %d\n", cur, cur->val);
+		assert(cur);
+		assert(cur->val == num_iterations);
+		++num_iterations;
 	}
 	
 	int comp = 3;
@@ -106,6 +110,36 @@ int main()
 	assert(!cur);
 	cur = genc_slist_find_obj(cur, struct int_list, head, list_entry_matches, &comp);
 	assert(!cur);
+	
+	// iteration with removal
+	pos = &list;
+	int num_removed = 0;
+	num_iterations = 0;
+	genc_slist_for_each_ref(cur, pos, struct int_list, head)
+	{
+		// remove elements which are multiples of 3
+		if (cur->val % 3 == 0)
+		{
+			genc_slist_remove_at(pos);
+			free(cur);
+			++num_removed;
+		}
+		++num_iterations;
+	}
+	
+	assert(num_removed == 4);
+	assert(num_iterations == 10);
+
+	// iteration of remaining elements
+	num_iterations = 0;
+	pos = &list;
+	genc_slist_for_each_ref(cur, pos, struct int_list, head)
+	{
+		assert(cur);
+		assert(cur->val % 3 != 0);
+		++num_iterations;
+	}
+	assert(num_iterations == 6);
 	
 	free_test_list(list);
 	

@@ -166,7 +166,7 @@ void genc_cht_destroy(struct genc_chaining_hash_table* table)
 
 static GENC_INLINE int genc_log2_size(size_t val)
 {
-	return val == 0 ? -1 : (sizeof(size_t) * 8 - 1 - __builtin_clzll(val));
+	return val == 0 ? -1 : (int)(sizeof(size_t) * 8 - 1 - __builtin_clzll(val));
 }
 
 static GENC_INLINE int genc_log2_size_roundup(size_t val)
@@ -200,7 +200,7 @@ int genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_he
 	unsigned new_load;
 	if (!item) return 0;
 	
-	new_load = 100ul * (table->item_count + 1ul) / table->capacity;
+	new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
 	if (new_load > table->load_percent_grow_threshold)
 	{
 		int factor_log2 = genc_log2_size(new_load / table->load_percent_grow_threshold);
@@ -273,7 +273,7 @@ struct slist_head* genc_cht_remove_ref(struct genc_chaining_hash_table* table, s
 	{
 		unsigned new_load = 0;
 		--table->item_count;
-		new_load = 100ull * (table->item_count) / table->capacity;
+		new_load = (unsigned)(100ull * (table->item_count) / table->capacity);
 
 		if (new_load > 0 && new_load < table->load_percent_shrink_threshold)
 		{

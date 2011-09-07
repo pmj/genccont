@@ -23,6 +23,12 @@ freely, subject to the following restrictions:
 
 #include "chaining_hash_table.h"
 
+#ifdef __GNUC__
+#define GENC_UNUSED __attribute__((unused))
+#else
+#define GENC_UNUSED
+#endif
+
 #ifndef GENC_MEMSET
 #if !defined(KERNEL) && !defined(__KERNEL__)
 /* required for memset() - if no memset is available or you'd like to provide
@@ -83,6 +89,20 @@ size_t genc_hash_uint64(uint64_t key)
   return (size_t)key;
 }
 #endif
+
+
+size_t genc_uint32_key_hash(void* item, void* opaque_unused GENC_UNUSED)
+{
+	return genc_hash_uint32(*(uint32_t*)item);
+}
+size_t genc_uint64_key_hash(void* item, void* opaque_unused GENC_UNUSED)
+{
+	return genc_hash_uint64(*(uint64_t*)item);
+}
+int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
+{
+	return *(uint64_t*)id1 == *(uint64_t*)id2;
+}
 
 
 

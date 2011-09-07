@@ -115,7 +115,7 @@ size_t genc_cht_count(struct genc_chaining_hash_table* table);
 
 size_t genc_cht_capacity(struct genc_chaining_hash_table* table);
 
-/* Drops all items from the table and deallocates used memory. */
+/* Drops all items from the table (without deleting them) and deallocates bucket array memory. */
 void genc_cht_destroy(struct genc_chaining_hash_table* table);
 
 /* Inserts the given item into the hash table.
@@ -173,6 +173,9 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 #endif
 }
 
+size_t genc_uint32_key_hash(void* item, void* opaque_unused);
+size_t genc_uint64_key_hash(void* item, void* opaque_unused);
+int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 
 #ifdef __cplusplus
 } /* extern "C" */

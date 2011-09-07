@@ -87,9 +87,34 @@ void genc_dlist_insert_before(struct dlist_head* new_entry, struct dlist_head* b
  */
 void genc_dlist_insert_after(struct dlist_head* new_entry, struct dlist_head* after);
 
-/** Removes the list element at the given position.
+/** Removes the list element at the given position and returns it
  */
-void genc_dlist_remove(struct dlist_head* at);
+struct dlist_head* genc_dlist_remove(struct dlist_head* entry);
+
+/** Returns 0 if the list contains elements, non-zero (1) if empty 
+ */
+int genc_dlist_is_empty(struct dlist_head* list);
+
+/** genc_dlist_remove_object(entry, list_type, list_head_member_name)
+ * Typed version of genc_dlist_remove_at(). */
+#define genc_dlist_remove_object(entry, list_type, list_head_member_name) \
+genc_container_of(genc_dlist_remove(entry), list_type, list_head_member_name)
+
+
+/* Iterate through a list with a for() loop, removing each element before entering the loop body.
+ * genc_dlist_for_each(removed_element, list_head, list_type, list_head_member_name)
+ * list_head - pointer to the list, must be of type struct dlist_head*.
+ *   list_head itself won't be modified, but (*list_head)'s members will (necessarily).
+ * removed_element - variable of pointer to list_type type, which references the
+ *   element which has been removed from the list in the loop body.
+ *   The loop body is responsible for reusing or freeing the memory.
+ *
+ * You may safely break out of this loop or use the 'continue' statement. When
+ * using break, goto or return to leave the loop, the list remains in a
+ * consistent state, with the elements not yet removed remaining in the list.
+ */
+#define genc_dlist_for_each_remove(removed_element, list_head, list_type, list_head_member_name) \
+for ((removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remove_object((list_head)->next, list_type, list_head_member_name)); removed_element; (removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remove_object((list_head)->next, list_type, list_head_member_name)))
 
 
 #ifdef __cplusplus

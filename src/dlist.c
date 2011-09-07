@@ -64,10 +64,16 @@ void genc_dlist_insert_after(struct dlist_head* new_entry, struct dlist_head* af
 
 /** Removes the list element at the given position.
  */
-void genc_dlist_remove(struct dlist_head* at)
+struct dlist_head* genc_dlist_remove(struct dlist_head* at)
 {
 	at->prev->next = at->next;
 	at->next->prev = at->prev;
 	at->next = NULL;
 	at->prev = NULL;
+	return at;
+}
+
+int genc_dlist_is_empty(struct dlist_head* list)
+{
+	return list->next == list;
 }

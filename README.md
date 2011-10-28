@@ -6,8 +6,9 @@ While working on a kernel-mode driver, I needed a simple, compact, singly-linked
 list that had no dependencies I couldn't satisfy in kernel space. Surprisingly,
 I found no such library. Despite my reluctance to succumb to NIH, I ended up
 writing my own implementation. I surely can't be the only one needing such a thing,
-so here it is. Later I also needed a queue and a generic hash table implementation,
-which triggered development of the genc_chaining_hash_table.
+so here it is. Later I also needed a queue, a generic hash table implementation,
+doubly linked lists and a binary search tree,
+which triggered development of the slist_queue, genc_chaining_hash_table, dlist and binary_tree.
 
 ## Design Goals
 
@@ -21,16 +22,24 @@ which triggered development of the genc_chaining_hash_table.
   generic programming or type safety, but in many cases, we can do better than
 	casting everything to `void*`. In some cases, compiler extensions are required
 	to do this, so some warnings will only appear on GCC and compatible compilers.
-- **Minimise use of macros.** Some container implementations are built entirely as
-  macros. I don't like macros, so the core functionality of the library is built
-	as straight C functions. There are small macros for wrapping function calls to
+- **Minimise use of macros.** The C container implementations I could find
+	are built entirely as
+	macros. I don't like macros - they're hard to debug, produce large
+	binaries, etc., so the core functionality for each container is built
+	as straight C functions. There are small macros for wrapping function
+	calls to
 	improve type safety of client code, but you don't have to use them.
+	They should also cause very little code to be produced at the call site,
+	mainly calculating struct offsets, checking for NULL where necessary and
+	calling the wrapped function.
 - **Minimise dynamic memory allocations.** If you're writing non-trivial code in C,
   I assume you know what you're doing regarding memory allocations. This also
 	ties into the minimal build requirements goal: `malloc()` and `free()` may
-	not be available or desirable. Therefore, the list and queue assume no memory
-	responsibility, whereas the hash table only allocates the table memory, not
-	individual entries. The library doesn't do any fancy pointer value twiddling,
+	not be available or desirable. Therefore, the singly and doubly linked
+	lists, the queue and the binary tree assume no memory
+	responsibility. The hash table only allocates the table memory, not
+	individual entries, and lets you provide a realloc()-like function.
+	The library doesn't do any fancy pointer value twiddling,
 	so it won't interfere with conservative garbage collectors.
 - **Permissive license.** I opted for the zlib license, which should be
   permissive enough for anyone, but if you'd prefer another open source license,
@@ -135,8 +144,8 @@ for details and examples.
 
 ## Plans/TODO
 
-- Documentation for the `slist_queue` and the chained hash table.
+- Documentation for the `slist_queue`, the `dlist`, the binary tree and the chained hash table.
 - Templated C++ wrappers where appropriate.
-- More data structures: e.g. doubly linked list and queue; hash tables with other
-memory layout and collision resolution strategies; trees; etc.
+- More data structures: e.g. hash tables with other
+memory layout and collision resolution strategies; a balanced tree; etc.
 - Wider testing (and support) of different platforms and compilers.

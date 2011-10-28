@@ -24,31 +24,7 @@ freely, subject to the following restrictions:
 #ifndef GENCCONT_DLIST_H
 #define GENCCONT_DLIST_H
 
-/* for standard C typedefs, NULL, offsetof(), etc. */
-#if defined(LINUX) && defined(__KERNEL__)
-/* compiling the linux kernel (or rather a module) */
-#include <linux/types.h>
-#include <linux/stddef.h>
-#elif defined(KERNEL) && defined(APPLE)
-/* xnu kernel */
-#include <IOKit/IOTypes.h>
-/* xnu for some reason doesn't typedef ptrdiff_t. To avoid stepping on toes,
- * we'll temporarily re-#define it in case another header sets it */
-#define ptrdiff_t __darwin_ptrdiff_t
-#else
-/* assume libc is available */
-#include <stddef.h>
-#endif
-
-
-#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(__GNUC__) && (!defined(__STRICT_ANSI__) || !__STRICT_ANSI__))
-#define GENC_INLINE inline
-#elif (defined(__GNUC__) && defined(__STRICT_ANSI__) && __STRICT_ANSI__)
-#define GENC_INLINE __inline__
-#else
-#define GENC_INLINE
-#endif
-
+#include "util.h"
 
 #ifdef __cplusplus
 extern "C" {

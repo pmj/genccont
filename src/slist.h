@@ -142,6 +142,11 @@ static GENC_INLINE char* genc_container_of_helper(const void* obj, ptrdiff_t off
 {
 	return (obj ? ((char*)obj - offset) : NULL);
 }
+/* function for avoiding multiple evaluation */
+static GENC_INLINE char* genc_container_of_notnull_helper(const void* obj, ptrdiff_t offset)
+{
+	return ((char*)obj - offset);
+}
 
 #ifdef __GNUC__
 
@@ -153,9 +158,20 @@ static GENC_INLINE char* genc_container_of_helper(const void* obj, ptrdiff_t off
 	__typeof__(obj) __attribute__ ((unused)) _p = _c ? &_c->member_name : NULL; \
 	_c; \
 	})
+
+#define genc_container_of_notnull(obj, cont_type, member_name) \
+({ \
+cont_type* _c = ((cont_type*)genc_container_of_notnull_helper((obj), offsetof(cont_type, member_name))); \
+__typeof__(obj) __attribute__ ((unused)) _p = &_c->member_name; \
+_c; \
+})
+
+
 #else
 #define genc_container_of(obj, cont_type, member_name) \
 ((cont_type*)genc_container_of_helper((obj), offsetof(cont_type, member_name)))
+#define genc_container_of_notnull(obj, cont_type, member_name) \
+((cont_type*)genc_container_of_notnull_helper((obj), offsetof(cont_type, member_name)))
 #endif
 
 static GENC_INLINE void* genc_member_of_helper(const void* obj, ptrdiff_t offset)

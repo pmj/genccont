@@ -44,3 +44,19 @@ int genc_slq_is_empty(struct slist_queue* queue)
 {
 	return !queue->head;
 }
+
+void genc_slq_swap(struct slist_queue* queue1, struct slist_queue* queue2)
+{
+	if (queue1 == queue2)
+		return;
+	
+	struct slist_queue tmp_q = *queue1;
+	*queue1 = *queue2;
+	*queue2 = tmp_q;
+		
+	/* fix up empty queue tails if necessary*/
+	if (queue1->tail == &queue2->head)
+		queue1->tail = &queue1->head;
+	if (queue2->tail == &queue1->head)
+		queue2->tail = &queue2->head;
+}

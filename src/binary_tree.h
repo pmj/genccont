@@ -21,8 +21,8 @@
  distribution.
  */
 
-#ifndef GENCCONT_SLIST_H
-#define GENCCONT_SLIST_H
+#ifndef GENCCONT_BINARY_TREE_H
+#define GENCCONT_BINARY_TREE_H
 
 #include "util.h"
 

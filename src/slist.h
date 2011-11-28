@@ -153,10 +153,10 @@ for (loop_var = genc_container_of((list_head), list_type, list_head_member_name)
 for (loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name); \
 	*(list_head_ref) != NULL; \
 	list_head_ref = \
-		((*(list_head_ref) != NULL) && (genc_container_of(*(list_head_ref), list_type, list_head_member_name) == (loop_var))) \
+		((*(list_head_ref) != NULL) && (genc_container_of_notnull(*(list_head_ref), list_type, list_head_member_name) == (loop_var))) \
 		? (&(*list_head_ref)->next) \
 		: list_head_ref, \
-	(loop_var = genc_container_of(*(list_head_ref), list_type, list_head_member_name)))
+	(loop_var = genc_container_of_notnull(*(list_head_ref), list_type, list_head_member_name)))
 
 /* Example:
  * Insert an element before each existing element.

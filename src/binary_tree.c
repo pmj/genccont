@@ -22,6 +22,7 @@
  */
 
 #include "binary_tree.h"
+#include <assert.h>
 
 static genc_bt_node_head_t* genc_bt_rightmost_in_subtree(genc_bt_node_head_t* subtree);
 static genc_bt_node_head_t* genc_bt_leftmost_in_subtree(genc_bt_node_head_t* subtree);
@@ -132,11 +133,17 @@ void genc_bt_remove(genc_binary_tree_t* tree, genc_bt_node_head_t* item)
 	{
 		if (item->parent->left == item)
 			parent_child_ref = &item->parent->left;
-		else if (item->parent->right == item)
+		else
+		{
+			assert(item->parent->right == item);
 			parent_child_ref = &item->parent->right;
+		}
 	}
-	else if (item == tree->root)
+	else
+	{
+		assert(item == tree->root);
 		parent_child_ref = &tree->root;
+	}
 	
 	*parent_child_ref = replacement;
 	

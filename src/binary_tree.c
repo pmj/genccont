@@ -22,7 +22,9 @@
  */
 
 #include "binary_tree.h"
+#ifndef KERNEL
 #include <assert.h>
+#endif
 
 static genc_bt_node_head_t* genc_bt_rightmost_in_subtree(genc_bt_node_head_t* subtree);
 static genc_bt_node_head_t* genc_bt_leftmost_in_subtree(genc_bt_node_head_t* subtree);

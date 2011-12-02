@@ -71,6 +71,10 @@ struct dlist_head* genc_dlist_remove(struct dlist_head* entry);
  */
 int genc_dlist_is_empty(struct dlist_head* list);
 
+/** Removes the list element at the end of the given list, or NULL if the list is empty
+ */
+struct dlist_head* genc_dlist_remove_last(struct dlist_head* list);
+
 /** genc_dlist_remove_object(entry, list_type, list_head_member_name)
  * Typed version of genc_dlist_remove_at(). */
 #define genc_dlist_remove_object(entry, list_type, list_head_member_name) \
@@ -91,6 +95,9 @@ genc_container_of(genc_dlist_remove(entry), list_type, list_head_member_name)
  */
 #define genc_dlist_for_each_remove(removed_element, list_head, list_type, list_head_member_name) \
 for ((removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remove_object((list_head)->next, list_type, list_head_member_name)); removed_element; (removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remove_object((list_head)->next, list_type, list_head_member_name)))
+
+#define genc_dlist_remove_last_object(list, list_type, list_head_member_name) \
+genc_container_of(genc_dlist_remove_last(list), list_type, list_head_member_name)
 
 
 #ifdef __cplusplus

@@ -37,7 +37,8 @@ struct genc_bt_iterator;
 typedef struct genc_binary_tree genc_binary_tree_t;
 typedef struct genc_bt_node_head genc_bt_node_head_t;
 
-/* Each element in a binary tree must contain such a structure */
+/* Each element in a binary tree must contain such a structure. Automatically
+ * initialised upon insertion into a tree. */
 struct genc_bt_node_head
 {
 	genc_bt_node_head_t* parent;

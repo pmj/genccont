@@ -41,6 +41,7 @@ struct slist_queue
 	/* Initialised to &head when empty and always updated to point at the 'next' member of the last list element. */
 	struct slist_head** tail;
 };
+typedef struct slist_queue slist_queue_t;
 
 /** Initialises an empty queue */
 void genc_slq_init(struct slist_queue* queue);

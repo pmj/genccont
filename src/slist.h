@@ -79,6 +79,8 @@ struct slist_head* genc_slist_remove_after(struct slist_head* after_entry);
 
 struct slist_head** genc_slist_find_tail(struct slist_head** head);
 
+/* Removes a NULL-terminated list from 'from' and adds the list at 'into' onto
+ * the end of it, pointing the 'into' head at the whole list. */
 struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_head** from);
 
 #ifdef __cplusplus

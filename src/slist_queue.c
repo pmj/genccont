@@ -60,3 +60,8 @@ void genc_slq_swap(struct slist_queue* queue1, struct slist_queue* queue2)
 	if (queue2->tail == &queue1->head)
 		queue2->tail = &queue2->head;
 }
+
+size_t genc_slq_length(slist_queue_t* queue)
+{
+	return genc_slist_length(queue->head);
+}

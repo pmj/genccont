@@ -97,3 +97,14 @@ struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_hea
 	return from_tail;
 }
 
+size_t genc_slist_length(struct slist_head* list)
+{
+	size_t len = 0;
+	while (list)
+	{
+		++len;
+		list = list->next;
+	}
+	return len;
+}
+

@@ -63,6 +63,8 @@ int genc_slq_is_empty(struct slist_queue* queue);
  * which needs to be fixed up after swapping. */
 void genc_slq_swap(struct slist_queue* queue1, struct slist_queue* queue2);
 
+/* Length of the queue, O(N) runtime complexity */
+size_t genc_slq_length(slist_queue_t* queue);
 	
 #ifdef __cplusplus
 } /* extern "C" */

@@ -83,6 +83,10 @@ struct slist_head** genc_slist_find_tail(struct slist_head** head);
  * the end of it, pointing the 'into' head at the whole list. */
 struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_head** from);
 
+/* Iterates the list until the end is reached, and returns the number of
+ * elements encountered. Runtime is therefore O(N). */
+size_t genc_slist_length(struct slist_head* list);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

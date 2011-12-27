@@ -249,3 +249,31 @@ genc_bt_node_head_t* genc_bt_prev_item(genc_binary_tree_t* tree, genc_bt_node_he
 		item = parent;
 	}
 }
+
+genc_bt_node_head_t* genc_bt_find_or_lower(genc_binary_tree_t* tree, genc_bt_node_head_t* item)
+{
+	genc_bt_node_head_t* parent = NULL;
+	genc_bt_node_head_t** found = genc_bt_find_insertion_point(tree, item, &parent);
+	if (*found)
+	{
+		/* exact match */
+		return *found;
+	}
+	else if (!parent)
+	{
+		/* tree is empty so far */
+		return NULL;
+	}
+	else if (tree->less_fn(parent, item, tree->less_fn_opaque))
+	{
+		/* parent is lower than item */
+		return parent;
+	}
+	else
+	{
+		/* parent is greater than item, find the next lower entry */
+		return genc_bt_prev_item(tree, parent);
+	}
+}
+
+

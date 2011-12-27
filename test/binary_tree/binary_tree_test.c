@@ -97,7 +97,7 @@ void test_manual()
 	assert(genc_bt_last_obj(tree, btt_item_t, bt_head) == NULL);
 	
 	btt_item_t a = { {}, 10, -10 };
-	btt_item_t b = { {}, 5, -5 };
+	btt_item_t b = { {}, 4, -4 };
 	btt_item_t c = { {}, 15, -15 };
 	btt_item_t d = { {}, 2, -2 };
 	btt_item_t e = { {}, 8, -8 };
@@ -134,6 +134,43 @@ void test_manual()
 	assert(ok);
 	check_order_invariant(tree, 8, 0);
 	
+	{
+		btt_item_t find_item = { {} };
+		find_item.key = 3;
+		genc_bt_node_head_t* found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &d.bt_head);
+
+		find_item.key = 2;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &d.bt_head);
+
+		find_item.key = 6;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &g.bt_head);
+
+		find_item.key = 1;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == NULL);
+
+		find_item.key = 15;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &c.bt_head);
+
+		find_item.key = 17;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &c.bt_head);
+
+		find_item.key = 14;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &a.bt_head);
+
+		find_item.key = 5;
+		found = genc_bt_find_or_lower(tree, &find_item.bt_head);
+		assert(found == &b.bt_head);
+
+	}
+	
+	/* try to insert duplicate, this should fail */
 	ok = genc_bt_insert(tree, &f2.bt_head);
 	assert(!ok);
 	check_order_invariant(tree, 8, 0);

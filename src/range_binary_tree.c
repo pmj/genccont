@@ -23,9 +23,11 @@
 
 #include "range_binary_tree.h"
 
+#ifndef KERNEL
 #include <assert.h>
+#endif
 
-static int range_node_less(genc_bt_node_head_t* a_head, genc_bt_node_head_t* b_head, void* opaque)
+static int range_node_less(genc_bt_node_head_t* a_head, genc_bt_node_head_t* b_head, void* opaque GENC_UNUSED)
 {
 	genc_range_binary_tree_item_t* a =
 		genc_container_of_notnull(a_head, genc_range_binary_tree_item_t, head);

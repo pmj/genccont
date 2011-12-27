@@ -53,6 +53,12 @@
 #define GENC_INLINE
 #endif
 
+#if defined(__GNUC__)
+#define GENC_UNUSED __attribute__((unused))
+#else
+#define GENC_UNUSED
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

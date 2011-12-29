@@ -102,6 +102,20 @@ int genc_range_bt_insert(genc_binary_tree_t* tree, genc_range_binary_tree_item_t
 	return genc_bt_insert(tree, &new_range->head);
 }
 
+void genc_range_bt_split_range(
+	genc_binary_tree_t* tree, genc_range_binary_tree_item_t* existing_range,
+	uint64_t split_at, genc_range_binary_tree_item_t* new_range)
+{
+	assert(split_at > existing_range->range_start && split_at < existing_range->range_end);
+	
+	new_range->range_end = existing_range->range_end;
+	new_range->range_start = split_at;
+	existing_range->range_end = split_at;
+	
+	int ok = genc_range_bt_insert(tree, new_range);
+	assert(ok);
+}
+
 genc_range_bt_chop_result_t genc_range_bt_chop_range(
 	genc_binary_tree_t* tree, genc_range_binary_tree_item_t* range, genc_range_binary_tree_item_t* split_item)
 {

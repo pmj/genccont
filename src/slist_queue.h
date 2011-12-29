@@ -55,6 +55,10 @@ struct slist_head* genc_slq_pop_front(struct slist_queue* queue);
 /** Inserts the given at the front of the queue. */
 void genc_slq_push_front(struct slist_queue* queue, struct slist_head* new_item);
 
+/** Returns the item at the front of the queue, or NULL if the queue is empty.
+ * Does NOT remove the returned item. */
+struct slist_head* genc_slq_front(struct slist_queue* queue);
+
 /* returns 0 if queue contains one or more items, 1 if empty */
 int genc_slq_is_empty(struct slist_queue* queue);
 
@@ -74,5 +78,8 @@ size_t genc_slq_length(slist_queue_t* queue);
  * Typed version of genc_slq_pop_front(). */
 #define genc_slq_pop_front_object(queue, list_type, list_head_member_name) \
 genc_container_of(genc_slq_pop_front(queue), list_type, list_head_member_name)
+
+#define genc_slq_front_object(queue, list_type, list_head_member_name) \
+genc_container_of(genc_slq_front(queue), list_type, list_head_member_name)
 
 #endif

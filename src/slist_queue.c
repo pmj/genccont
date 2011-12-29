@@ -65,3 +65,8 @@ size_t genc_slq_length(slist_queue_t* queue)
 {
 	return genc_slist_length(queue->head);
 }
+
+struct slist_head* genc_slq_front(struct slist_queue* queue)
+{
+	return queue->head;
+}

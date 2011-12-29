@@ -72,7 +72,7 @@ size_t genc_slq_length(slist_queue_t* queue);
 
 /* Moves all all elements of from_queue onto the end of onto_end_of_queue,
  * leaving from_queue empty. */
-void genc_slq_splice_onto_end(slist_queue_t* onto_end_of_queue, slist_queue_t* from_queue)
+void genc_slq_splice_onto_end(slist_queue_t* onto_end_of_queue, slist_queue_t* from_queue);
 
 #ifdef __cplusplus
 } /* extern "C" */

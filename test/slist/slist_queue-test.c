@@ -70,7 +70,24 @@ int main()
 	genc_slq_push_back(&queue, &new_int_list(3)->head);
 	genc_slq_push_front(&queue, &new_int_list(0)->head);
 	genc_slq_push_back(&queue, &new_int_list(4)->head);
-	genc_slq_push_back(&queue, &new_int_list(5)->head);
+	
+	slist_queue_t other_queue;
+	genc_slq_init(&other_queue);
+	
+	genc_slq_push_back(&other_queue, &new_int_list(6)->head);
+	genc_slq_push_back(&other_queue, &new_int_list(7)->head);
+	genc_slq_push_front(&other_queue, &new_int_list(5)->head);
+	genc_slq_push_back(&other_queue, &new_int_list(8)->head);
+	
+	assert(genc_slq_length(&queue) == 5);
+	assert(genc_slq_length(&other_queue) == 4);
+	
+	genc_slq_splice_onto_end(&queue, &other_queue);
+
+	assert(genc_slq_length(&queue) == 9);
+	assert(genc_slq_length(&other_queue) == 0);
+	
+	assert(genc_slq_is_empty(&other_queue));
 	
 	item = genc_slq_pop_front_object(&queue, struct int_list, head);
 	assert(item->val == 0);
@@ -96,9 +113,23 @@ int main()
 	assert(item->val == 5);
 	free(item);
 
+	item = genc_slq_pop_front_object(&queue, struct int_list, head);
+	assert(item->val == 6);
+	free(item);
+
+	item = genc_slq_pop_front_object(&queue, struct int_list, head);
+	assert(item->val == 7);
+	free(item);
+
+	item = genc_slq_pop_front_object(&queue, struct int_list, head);
+	assert(item->val == 8);
+	free(item);
+
 
 	assert(queue.head == NULL);
 	assert(queue.tail == &queue.head);
+
+	assert(genc_slq_is_empty(&queue));
 
 	return 0;
 }

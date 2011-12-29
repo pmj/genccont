@@ -70,3 +70,13 @@ struct slist_head* genc_slq_front(struct slist_queue* queue)
 {
 	return queue->head;
 }
+
+void genc_slq_splice_onto_end(slist_queue_t* onto_end_of_queue, slist_queue_t* from_queue)
+{
+	if (genc_slq_is_empty(from_queue))
+		return;
+	*onto_end_of_queue->tail = from_queue->head;
+	onto_end_of_queue->tail = from_queue->tail;
+	from_queue->head = NULL;
+	from_queue->tail = &from_queue->head;
+}

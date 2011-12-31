@@ -276,4 +276,14 @@ genc_bt_node_head_t* genc_bt_find_or_lower(genc_binary_tree_t* tree, genc_bt_nod
 	}
 }
 
+void genc_bt_swap_trees(genc_binary_tree_t* tree_a, genc_binary_tree_t* tree_b)
+{
+	genc_binary_tree_t temp = *tree_a;
+	*tree_a = *tree_b;
+	*tree_b = temp;
+}
 
+int genc_bt_is_empty(genc_binary_tree_t* tree)
+{
+	return tree->root == NULL;
+}

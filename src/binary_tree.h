@@ -88,7 +88,8 @@ genc_bt_node_head_t* genc_bt_next_item(genc_binary_tree_t* tree, genc_bt_node_he
 genc_bt_node_head_t* genc_bt_last_item(genc_binary_tree_t* tree);
 genc_bt_node_head_t* genc_bt_prev_item(genc_binary_tree_t* tree, genc_bt_node_head_t* before_item);
 
-	
+void genc_bt_swap_trees(genc_binary_tree_t* tree_a, genc_binary_tree_t* tree_b);
+int genc_bt_is_empty(genc_binary_tree_t* tree);
 
 #ifdef __cplusplus
 } /* extern "C" */

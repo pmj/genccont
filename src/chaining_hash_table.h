@@ -143,6 +143,9 @@ void genc_cht_shrink_by(struct genc_chaining_hash_table* table, unsigned log2_sh
 /* Grow the capacity of the table by a factor of 1 << log2_grow_factor */
 void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow_factor);
 
+/* Walks all the elements in the hash table and checks they're still in the correct bucket. */
+void genc_cht_verify(struct genc_chaining_hash_table* table);
+
 struct genc_chaining_hash_table
 {
 	genc_chaining_key_hash_fn hash_fn;
@@ -184,7 +187,13 @@ int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 #define genc_cht_find_obj(table, key, type, header_name) \
 genc_container_of(genc_cht_find((table), (key)), type, header_name)
 
-#define genc_cht_for_each_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME) \
+#define genc_cht_for_each_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR) \
+for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \
+	BUCKET_VAR < (TABLE)->capacity; \
+	++BUCKET_VAR, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR) \
+		genc_slist_for_each_head_ref(ENTRY_VAR, CUR_HEAD_PTR_VAR)
+
+#define genc_cht_for_each_obj_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME) \
 for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \
 	BUCKET_VAR < (TABLE)->capacity; \
 	++BUCKET_VAR, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR) \

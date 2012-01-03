@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
  * your own, compile with GENC_MEMSET defined to the name of your implementation. */
 /*#include <stdio.h>*/
 #include <string.h>
+#include <assert.h>
 #else
 void* GENC_MEMSET(void *, int, size_t);
 #endif
@@ -263,24 +264,30 @@ struct slist_head* genc_cht_find(struct genc_chaining_hash_table* table, void* k
 	return *genc_cht_find_ref(table, key);
 }
 
+struct slist_head** genc_cht_get_bucket_ref_for_key(struct genc_chaining_hash_table* table, void* key)
+{
+	void* op = table->opaque;
+	genc_hash_t hash = 0;
+	size_t idx;
+	
+	hash = table->hash_fn(key, op);
+	idx = hash & (table->capacity - 1ul);
+	return table->buckets + idx;
+}
+
+
 /* Looks up the key in the table, returning the reference pointing to the
  * matching item, or NULL if not found. The reference may be passed to
  * genc_cht_find_ref() for efficient removal. */
 struct slist_head** genc_cht_find_ref(struct genc_chaining_hash_table* table, void* key)
 {
-	void* op = table->opaque;
-	genc_hash_t hash = 0;
-	size_t idx;
+	struct slist_head** bucket = genc_cht_get_bucket_ref_for_key(table, key);
+	
 	genc_cht_match_ctx_t ctx;
-
 	ctx.table = table;
 	ctx.key = key;
-	
-	hash = table->hash_fn(key, op);
-	idx = hash & (table->capacity - 1ul);
-	
-	
-	return genc_slist_find_entry_ref(table->buckets + idx, genc_item_matches_key, &ctx);
+
+	return genc_slist_find_entry_ref(bucket, genc_item_matches_key, &ctx);
 }
 
 /* Removes the item referred to by item_ref from the hash table, returning it.
@@ -393,7 +400,8 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 					if (idx == i)
 						break;
 					/* remove from chain, add to new bucket */
-					genc_slist_remove_at(cur_ref);
+					slist_head_t* rem = genc_slist_remove_at(cur_ref);
+					assert(rem == cur);
 					genc_slist_insert_at(cur, buckets + idx);
 					cur = *cur_ref;
 				}
@@ -401,3 +409,18 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 		}
 	}
 }
+
+/* Walks all the elements in the hash table and checks they're still in the correct bucket. */
+void genc_cht_verify(struct genc_chaining_hash_table* table)
+{
+	size_t bucket = 0;
+	slist_head_t** bucket_head = NULL;
+	slist_head_t* entry = NULL;
+	genc_hash_t mask = table->capacity - 1;
+	genc_cht_for_each_ref(table, entry, bucket_head, bucket)
+	{
+		genc_hash_t hash = table->hash_fn(table->get_key_fn(entry, table->opaque), table->opaque);
+		assert((hash & mask) == bucket);
+	}
+}
+

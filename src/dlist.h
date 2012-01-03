@@ -75,11 +75,13 @@ int genc_dlist_is_empty(struct dlist_head* list);
  */
 struct dlist_head* genc_dlist_remove_last(struct dlist_head* list);
 
+/** Returns the last entry in the given list, or NULL if the list is empty */
+struct dlist_head* genc_dlist_last(struct dlist_head* list);
+
 /** genc_dlist_remove_object(entry, list_type, list_head_member_name)
  * Typed version of genc_dlist_remove_at(). */
 #define genc_dlist_remove_object(entry, list_type, list_head_member_name) \
 genc_container_of(genc_dlist_remove(entry), list_type, list_head_member_name)
-
 
 /* Iterate through a list with a for() loop, removing each element before entering the loop body.
  * genc_dlist_for_each(removed_element, list_head, list_type, list_head_member_name)
@@ -98,6 +100,9 @@ for ((removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remov
 
 #define genc_dlist_remove_last_object(list, list_type, list_head_member_name) \
 genc_container_of(genc_dlist_remove_last(list), list_type, list_head_member_name)
+
+#define genc_dlist_last_object(list, list_type, list_head_member_name) \
+genc_container_of(genc_dlist_last(list), list_type, list_head_member_name)
 
 
 #ifdef __cplusplus

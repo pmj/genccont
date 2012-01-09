@@ -29,6 +29,11 @@ void genc_dlist_init(struct dlist_head* head)
 	head->prev = head;
 }
 
+void genc_dlist_head_zero(struct dlist_head* head)
+{
+	head->next = head->prev = NULL;
+}
+
 struct dlist_head* genc_dlist_find_in_range(struct dlist_head* start_after, struct dlist_head* end_before, genc_dlist_entry_pred_fn pred, void* data)
 {
 	struct dlist_head* cur = start_after->next;

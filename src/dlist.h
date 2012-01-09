@@ -42,6 +42,10 @@ struct dlist_head
 /* Initialises an empty list. */
 void genc_dlist_init(struct dlist_head* head);
 
+/* Sets the list membership head to all NULLs (not part of a list) */
+void genc_dlist_head_zero(struct dlist_head* head);
+
+
 /* predicate function type for filtering list entries, returns 0 for no match, non-0 for match */
 typedef int (*genc_dlist_entry_pred_fn)(struct dlist_head* entry, void* data);
 
@@ -104,6 +108,8 @@ genc_container_of(genc_dlist_remove_last(list), list_type, list_head_member_name
 #define genc_dlist_last_object(list, list_type, list_head_member_name) \
 genc_container_of(genc_dlist_last(list), list_type, list_head_member_name)
 
+#define genc_dlist_insert_object_after(new_entry, after, list_head_member_name) \
+genc_dlist_insert_after(&((new_entry)->list_head_member_name), &((after)->list_head_member_name))
 
 #ifdef __cplusplus
 } /* extern "C" */

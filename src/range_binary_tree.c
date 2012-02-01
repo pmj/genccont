@@ -27,7 +27,7 @@
 #include <assert.h>
 #endif
 
-static int range_node_less(genc_bt_node_head_t* a_head, genc_bt_node_head_t* b_head, void* opaque GENC_UNUSED)
+static genc_bool_t range_node_less(genc_bt_node_head_t* a_head, genc_bt_node_head_t* b_head, void* opaque GENC_UNUSED)
 {
 	genc_range_binary_tree_item_t* a =
 		genc_container_of_notnull(a_head, genc_range_binary_tree_item_t, head);
@@ -100,7 +100,7 @@ genc_range_bt_node_range_t genc_range_bt_find_overlap(genc_binary_tree_t* tree, 
 	return overlap;
 }
 
-int genc_range_bt_insert(genc_binary_tree_t* tree, genc_range_binary_tree_item_t* new_range)
+genc_bool_t genc_range_bt_insert(genc_binary_tree_t* tree, genc_range_binary_tree_item_t* new_range)
 {
 	genc_range_bt_node_range_t overlap = genc_range_bt_find_overlap(tree, new_range);
 	if (overlap.start != overlap.end)

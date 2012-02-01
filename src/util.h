@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+ Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>/<phil@ssdcache.com>
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -45,12 +45,29 @@
 #endif
 
 
+/* We define a boolean type genc_bool_t to try to cover all standards cleanly
+ * Use standard boolean type 'bool' for C99, C++ and GNU C. If not available,
+ * use char; this assumes sizeof(bool) == sizeof(_Bool) == sizeof(char) === 1.
+ *
+ * We #define GENC_INLINE to be the target language's inline specifier, if it
+ * has one. Old Cs don't have one, so this is only used together with the static storage
+ * specifier to avoid linkage issues. */
 #if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || (defined(__GNUC__) && (!defined(__STRICT_ANSI__) || !__STRICT_ANSI__))
 #define GENC_INLINE inline
+
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
+typedef bool genc_bool_t;
+
 #elif (defined(__GNUC__) && defined(__STRICT_ANSI__) && __STRICT_ANSI__)
 #define GENC_INLINE __inline__
+typedef char genc_bool_t;
+
 #else
 #define GENC_INLINE
+typedef char genc_bool_t;
+
 #endif
 
 #if defined(__GNUC__)

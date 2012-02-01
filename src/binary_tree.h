@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+ Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -46,14 +46,14 @@ struct genc_bt_node_head
 	genc_bt_node_head_t* right;
 };
 
-/* Must return 1 if a should appear before b, 0 otherwise.
+/* Must return true(1) if a should appear before b, false(0) otherwise.
  * To test for equality, the function will be called with
- * reversed arguments if the first call returns 0. The
- * second call must return 0 as well if the items are equal.
+ * reversed arguments if the first call returns false. The
+ * second call must return false as well if the items are equal.
  * The opaque pointer can be used to affect the comparison behaviour on a
  * per-tree basis and will match the pointer passed to genc_binary_tree_init().
  */
-typedef int(*genc_binary_tree_less_fn)(genc_bt_node_head_t* a, genc_bt_node_head_t* b, void* opaque);
+typedef genc_bool_t(*genc_binary_tree_less_fn)(genc_bt_node_head_t* a, genc_bt_node_head_t* b, void* opaque);
 
 struct genc_binary_tree
 {
@@ -67,8 +67,8 @@ struct genc_binary_tree
 /* Initialise a blank binary tree, using the specified comparison function */
 void genc_binary_tree_init(genc_binary_tree_t* tree, genc_binary_tree_less_fn less_fn, void* less_fn_opaque);
 /* Insert an item into the tree by searching the tree to find the appropriate
- * location. Returns 1 on success or 0 if an equal item is already present. */
-int genc_bt_insert(genc_binary_tree_t* tree, genc_bt_node_head_t* item);
+ * location. Returns true (1) on success or false (0) if an equal item is already present. */
+genc_bool_t genc_bt_insert(genc_binary_tree_t* tree, genc_bt_node_head_t* item);
 /* Remove the given item from the tree. */
 void genc_bt_remove(genc_binary_tree_t* tree, genc_bt_node_head_t* item);
 /* Search the tree for an item value and return the reference pointing to the
@@ -89,7 +89,7 @@ genc_bt_node_head_t* genc_bt_last_item(genc_binary_tree_t* tree);
 genc_bt_node_head_t* genc_bt_prev_item(genc_binary_tree_t* tree, genc_bt_node_head_t* before_item);
 
 void genc_bt_swap_trees(genc_binary_tree_t* tree_a, genc_binary_tree_t* tree_b);
-int genc_bt_is_empty(genc_binary_tree_t* tree);
+genc_bool_t genc_bt_is_empty(genc_binary_tree_t* tree);
 
 #ifdef __cplusplus
 } /* extern "C" */

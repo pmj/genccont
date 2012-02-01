@@ -68,7 +68,7 @@ void free_test_list(struct slist_head* l)
 	}
 }
 
-int list_entry_matches(struct slist_head* entry, void* data)
+genc_bool_t list_entry_matches(struct slist_head* entry, void* data)
 {
 	struct int_list* e = genc_container_of(entry, struct int_list, head);
 	int* comp_ptr = data;

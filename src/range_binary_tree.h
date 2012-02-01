@@ -60,9 +60,9 @@ void genc_range_binary_tree_init(genc_binary_tree_t* tree);
 genc_range_bt_node_range_t genc_range_bt_find_overlap(genc_binary_tree_t* tree, genc_range_binary_tree_item_t* range);
 
 /* Inserts a new range into the tree if it doesn't overlap any existing nodes,
- * returning 1 on success. 0 is returned if the range wasn't added because there
+ * returning true(1) on success. false(0) is returned if the range wasn't added because there
  * is overlap. */
-int genc_range_bt_insert(genc_binary_tree_t* tree, genc_range_binary_tree_item_t* new_range);
+genc_bool_t genc_range_bt_insert(genc_binary_tree_t* tree, genc_range_binary_tree_item_t* new_range);
 
 struct genc_range_bt_chop_result
 {

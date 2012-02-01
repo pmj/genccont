@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -68,8 +68,8 @@ typedef genc_hash_t(*genc_chaining_key_hash_fn)(void* item, void* opaque);
 typedef void*(*genc_chaining_hash_get_item_key_fn)(struct slist_head* item, void* opaque);
 
 /* key-key equality function to be implemented by the client
- * Shall return 0 for inequality and 1 for equality. */
-typedef int(*genc_chaining_hash_key_equality_fn)(void* key1, void* key2, void* opaque);
+ * Shall return false(0) for inequality and true(1) for equality. */
+typedef genc_bool_t(*genc_chaining_hash_key_equality_fn)(void* key1, void* key2, void* opaque);
 
 /* memory re-allocation function. Semantics similar to C's realloc(), copying allowed.
  * new_size = 0 frees memory
@@ -84,7 +84,7 @@ struct genc_chaining_hash_table;
 
 /* Initialises the empty hash table with the given function implementations and capacity.
  * Defaults (70, 0) are used for load factor percentage thresholds for growing and shrinking. */
-int genc_chaining_hash_table_init(
+genc_bool_t genc_chaining_hash_table_init(
 	struct genc_chaining_hash_table* table,
 	genc_chaining_key_hash_fn hash_fn,
 	genc_chaining_hash_get_item_key_fn get_key_fn,
@@ -99,7 +99,7 @@ int genc_chaining_hash_table_init(
  * oscillation.
  * Capacity is always a power of 2.
  */
-int genc_chaining_hash_table_init_ext(
+genc_bool_t genc_chaining_hash_table_init_ext(
 	struct genc_chaining_hash_table* table,
 	genc_chaining_key_hash_fn hash_fn,
 	genc_chaining_hash_get_item_key_fn get_key_fn,
@@ -119,8 +119,8 @@ size_t genc_cht_capacity(struct genc_chaining_hash_table* table);
 void genc_cht_destroy(struct genc_chaining_hash_table* table);
 
 /* Inserts the given item into the hash table.
- * Returns 0 to report failure due to a duplicate, 1 on success. */
-int genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_head* item);
+ * Returns false/0 to report failure due to a duplicate, true/1 on success. */
+genc_bool_t genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_head* item);
 
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */
 struct slist_head* genc_cht_find(struct genc_chaining_hash_table* table, void* key);
@@ -178,7 +178,7 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 
 size_t genc_uint32_key_hash(void* item, void* opaque_unused);
 size_t genc_uint64_key_hash(void* item, void* opaque_unused);
-int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
+genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 
 #ifdef __cplusplus
 } /* extern "C" */

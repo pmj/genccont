@@ -31,7 +31,6 @@ static void* cht_test_realloc(void* old, size_t old_size, size_t new_size)
 }
 
 typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
-typedef struct slist_head slist_head_t;
 
 struct test_entry
 {
@@ -53,7 +52,7 @@ static void* cht_test_get_key(struct slist_head* hash_head, void* opaque)
 	return &e->key;
 }
 
-static int cht_test_keys_equal(void* key1, void* key2, void* opaque)
+static genc_bool_t cht_test_keys_equal(void* key1, void* key2, void* opaque)
 {
 	assert(!opaque);
 	assert(key1);
@@ -73,9 +72,9 @@ int main()
 	genc_chaining_hash_table_t table;
 	unsigned key = 0;
 	int res = 0;
-	slist_head_t** ref = NULL;
+	genc_slist_head_t** ref = NULL;
 	size_t count = 0, capacity = 0, bucket = 0;
-	slist_head_t* removed = NULL;
+	genc_slist_head_t* removed = NULL;
 	struct test_entry* cur = NULL;
 	
 	genc_chaining_hash_table_init(&table, cht_test_hash, cht_test_get_key, cht_test_keys_equal, cht_test_realloc, NULL, 4);
@@ -133,7 +132,7 @@ int main()
 	/* test iteration */
 	count = 0;
 	res = 0;
-	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	genc_cht_for_each_obj_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
 	{
 		++count;
 		res += cur->val;
@@ -194,7 +193,7 @@ int main()
 	/* test iteration with removal */
 	count = 0;
 	res = 0;
-	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	genc_cht_for_each_obj_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
 	{
 		++count;
 		if (cur->val % 200 == 0)
@@ -212,7 +211,7 @@ int main()
 	/* test remaining items */
 	count = 0;
 	res = 0;
-	genc_cht_for_each_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
+	genc_cht_for_each_obj_ref(&table, cur, ref, bucket, struct test_entry, hash_head)
 	{
 		++count;
 		res += cur->val;

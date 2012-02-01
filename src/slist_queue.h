@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -60,7 +60,7 @@ void genc_slq_push_front(struct slist_queue* queue, struct slist_head* new_item)
 struct slist_head* genc_slq_front(struct slist_queue* queue);
 
 /* returns 0 if queue contains one or more items, 1 if empty */
-int genc_slq_is_empty(struct slist_queue* queue);
+genc_bool_t genc_slq_is_empty(struct slist_queue* queue);
 
 /* Swaps the contents of the two queues. This isn't quite as trivial as swapping
  * the pointer values as the tail of an empty queue points to its head pointer,

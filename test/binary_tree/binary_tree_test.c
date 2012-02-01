@@ -38,7 +38,7 @@ typedef struct btt_item btt_item_t;
 
 static int dummy;
 
-static int btt_item_less(genc_bt_node_head_t* a, genc_bt_node_head_t* b, void* opaque)
+static genc_bool_t btt_item_less(genc_bt_node_head_t* a, genc_bt_node_head_t* b, void* opaque)
 {
 	assert(opaque == &dummy);
 	btt_item_t* item_a = genc_container_of_notnull(a, btt_item_t, bt_head);

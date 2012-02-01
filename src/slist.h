@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,8 +38,10 @@ struct slist_head
 	/* NULL if we've hit the end */
 	struct slist_head* next;
 };
-/* predicate function type for filtering list entries, returns 0 for no match, non-0 for match */
-typedef int (*genc_slist_entry_pred_fn)(struct slist_head* entry, void* data);
+typedef struct slist_head genc_slist_head_t;
+
+/* predicate function type for filtering list entries, returns true(0) for no match, false(1) for match */
+typedef genc_bool_t (*genc_slist_entry_pred_fn)(struct slist_head* entry, void* data);
 
 /** Locates a specific list entry based on the given predicate function.
  * Returns a pointer to the first matched element, or NULL if none is found.

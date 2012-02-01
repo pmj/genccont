@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+ Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -62,7 +62,7 @@ genc_bt_node_head_t** genc_bt_find_insertion_point(genc_binary_tree_t* tree, gen
 	return child_ref;
 }
 
-int genc_bt_insert(genc_binary_tree_t* tree, genc_bt_node_head_t* item)
+genc_bool_t genc_bt_insert(genc_binary_tree_t* tree, genc_bt_node_head_t* item)
 {
 	item->left = NULL;
 	item->right = NULL;
@@ -283,7 +283,7 @@ void genc_bt_swap_trees(genc_binary_tree_t* tree_a, genc_binary_tree_t* tree_b)
 	*tree_b = temp;
 }
 
-int genc_bt_is_empty(genc_binary_tree_t* tree)
+genc_bool_t genc_bt_is_empty(genc_binary_tree_t* tree)
 {
 	return tree->root == NULL;
 }

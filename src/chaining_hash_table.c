@@ -50,7 +50,6 @@ void* GENC_MEMSET(void *, int, size_t);
 #endif
 
 
-typedef struct slist_head slist_head_t;
 typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
 
 /* integer hashes described in http://www.cris.com/~Ttwang/tech/inthash.htm */
@@ -100,7 +99,7 @@ size_t genc_uint64_key_hash(void* item, void* opaque_unused GENC_UNUSED)
 {
 	return genc_hash_uint64(*(uint64_t*)item);
 }
-int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
+genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
 {
 	return *(uint64_t*)id1 == *(uint64_t*)id2;
 }
@@ -109,7 +108,7 @@ int genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED
 
 /* Initialises the empty hash table with the given function implementations and capacity.
  * Defaults (70, 0) are used for load factor percentage thresholds for growing and shrinking. */
-int genc_chaining_hash_table_init(
+genc_bool_t genc_chaining_hash_table_init(
 	struct genc_chaining_hash_table* table,
 	genc_chaining_key_hash_fn hash_fn,
 	genc_chaining_hash_get_item_key_fn get_key_fn,
@@ -128,7 +127,7 @@ static GENC_INLINE int genc_is_pow2(size_t val)
 
 
 /* initialises the hash table with non-default thresholds. Table will only grow on insertion and shrink on removal. */
-int genc_chaining_hash_table_init_ext(
+genc_bool_t genc_chaining_hash_table_init_ext(
 	struct genc_chaining_hash_table* table,
 	genc_chaining_key_hash_fn hash_fn,
 	genc_chaining_hash_get_item_key_fn get_key_fn,
@@ -142,10 +141,10 @@ int genc_chaining_hash_table_init_ext(
 	void* buckets;
 	if (!genc_is_pow2(initial_capacity_pow2))
 		return 0;
-	buckets = realloc_fn(NULL, 0, initial_capacity_pow2 * sizeof(slist_head_t*));
+	buckets = realloc_fn(NULL, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*));
 	if (!buckets)
 		return 0;
-	GENC_MEMSET(buckets, 0, initial_capacity_pow2 * sizeof(slist_head_t*));
+	GENC_MEMSET(buckets, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*));
 	
 	table->hash_fn = hash_fn;
 	table->get_key_fn = get_key_fn;
@@ -154,7 +153,7 @@ int genc_chaining_hash_table_init_ext(
 	table->opaque = opaque;
 	table->capacity = initial_capacity_pow2;
 	table->item_count = 0;
-	table->buckets = GENC_CXX_CAST(slist_head_t**, buckets);
+	table->buckets = GENC_CXX_CAST(genc_slist_head_t**, buckets);
 	table->load_percent_grow_threshold = load_percent_grow_threshold;
 	table->load_percent_shrink_threshold = load_percent_shrink_threshold;
 	
@@ -178,7 +177,7 @@ void genc_cht_destroy(struct genc_chaining_hash_table* table)
 {
 	if (table->buckets)
 	{
-		table->realloc_fn(table->buckets, table->capacity * sizeof(slist_head_t*), 0);
+		table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), 0);
 		table->buckets = NULL;
 		table->capacity = 0;
 		table->item_count = 0;
@@ -205,7 +204,7 @@ struct genc_cht_match_ctx
 typedef struct genc_cht_match_ctx genc_cht_match_ctx_t;
 
 /* predicate function for searching a chain for a matching item */
-static int genc_item_matches_key(struct slist_head* entry, void* data)
+static genc_bool_t genc_item_matches_key(struct slist_head* entry, void* data)
 {
 	genc_cht_match_ctx_t* ctx = GENC_CXX_CAST(genc_cht_match_ctx_t*, data);
 	genc_chaining_hash_table_t* table = ctx->table;
@@ -216,7 +215,7 @@ static int genc_item_matches_key(struct slist_head* entry, void* data)
 
 /* Inserts the given item into the hash table.
  * Returns 0 to report failure due to a duplicate, 1 on success. */
-int genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_head* item)
+genc_bool_t genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_head* item)
 {
 	unsigned new_load;
 	if (!item) return 0;
@@ -233,7 +232,7 @@ int genc_cht_insert_item(struct genc_chaining_hash_table* table, struct slist_he
 	}
 	
 	{
-		slist_head_t* found = NULL;
+		genc_slist_head_t* found = NULL;
 		genc_cht_match_ctx_t ctx;
 		void* op = table->opaque;
 		void* key = table->get_key_fn(item, op);
@@ -295,7 +294,7 @@ struct slist_head** genc_cht_find_ref(struct genc_chaining_hash_table* table, vo
  */
 struct slist_head* genc_cht_remove_ref(struct genc_chaining_hash_table* table, struct slist_head** item_ref)
 {
-	slist_head_t* removed = genc_slist_remove_at(item_ref);
+	genc_slist_head_t* removed = genc_slist_remove_at(item_ref);
 	if (removed)
 	{
 		unsigned new_load = 0;
@@ -314,7 +313,7 @@ struct slist_head* genc_cht_remove_ref(struct genc_chaining_hash_table* table, s
 /* Calls genc_cht_find_ref() and calls genc_cht_remove_ref() with the result if a match was found. */
 struct slist_head* genc_cht_remove(struct genc_chaining_hash_table* table, void* key)
 {
-	slist_head_t** found = genc_cht_find_ref(table, key);
+	genc_slist_head_t** found = genc_cht_find_ref(table, key);
 	if (found && *found)
 		return genc_cht_remove_ref(table, found);
 	return NULL;
@@ -324,7 +323,7 @@ struct slist_head* genc_cht_remove(struct genc_chaining_hash_table* table, void*
 void genc_cht_shrink_by(struct genc_chaining_hash_table* table, unsigned log2_shrink_factor)
 {
 	size_t new_capacity = 0;
-	slist_head_t** buckets = NULL;
+	genc_slist_head_t** buckets = NULL;
 	
 	if (table->capacity <= 1 || log2_shrink_factor == 0)
 		return;
@@ -348,14 +347,14 @@ void genc_cht_shrink_by(struct genc_chaining_hash_table* table, unsigned log2_sh
 		}
 	}
 	
-	table->buckets = GENC_CXX_CAST(slist_head_t**, table->realloc_fn(buckets, table->capacity * sizeof(slist_head_t*), new_capacity * sizeof(slist_head_t*)));
+	table->buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*)));
 	table->capacity = new_capacity;
 }
 
 /* Grow the capacity of the table by a factor of 1 << log2_grow_factor  */
 void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow_factor)
 {
-	slist_head_t** buckets = NULL;
+	genc_slist_head_t** buckets = NULL;
 	size_t old_capacity = 0;
 	size_t new_capacity = table->capacity << log2_grow_factor;
 	while (new_capacity < table->capacity)
@@ -367,7 +366,7 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 	if (new_capacity == table->capacity)
 		return;
 
-	buckets = GENC_CXX_CAST(slist_head_t**, table->realloc_fn(table->buckets, table->capacity * sizeof(slist_head_t*), new_capacity * sizeof(slist_head_t*)));
+	buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*)));
 	if (!buckets)
 		return;
 		
@@ -387,8 +386,8 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 		size_t i;
 		for (i = 0; i < old_capacity; ++i)
 		{
-			slist_head_t* cur = NULL;
-			slist_head_t** cur_ref = buckets + i;
+			genc_slist_head_t* cur = NULL;
+			genc_slist_head_t** cur_ref = buckets + i;
 			genc_slist_for_each_head_ref(cur, cur_ref)
 			{
 				while (cur) /* Need this as we'd end up skipping an item after every one we remove otherwise */
@@ -400,7 +399,7 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 					if (idx == i)
 						break;
 					/* remove from chain, add to new bucket */
-					slist_head_t* rem = genc_slist_remove_at(cur_ref);
+					genc_slist_head_t* rem = genc_slist_remove_at(cur_ref);
 					assert(rem == cur);
 					genc_slist_insert_at(cur, buckets + idx);
 					cur = *cur_ref;
@@ -414,8 +413,8 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 void genc_cht_verify(struct genc_chaining_hash_table* table)
 {
 	size_t bucket = 0;
-	slist_head_t** bucket_head = NULL;
-	slist_head_t* entry = NULL;
+	genc_slist_head_t** bucket_head = NULL;
+	genc_slist_head_t* entry = NULL;
 	genc_hash_t mask = table->capacity - 1;
 	genc_cht_for_each_ref(table, entry, bucket_head, bucket)
 	{

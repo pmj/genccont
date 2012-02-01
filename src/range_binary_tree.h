@@ -98,6 +98,9 @@ void genc_range_bt_split_range(
 }
 #endif
 
+#define genc_range_bt_next_item(tree, item) \
+	genc_container_of(genc_bt_next_item(tree, &(item)->head), genc_range_binary_tree_item_t, head)
+
 #define genc_range_bt_next_obj(tree, item, type, member) \
 	genc_container_of(genc_bt_next_item(tree, &(item)->member.head), type, member.head)
 

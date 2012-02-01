@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+ Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -51,6 +51,12 @@ static int compare_ranges(genc_range_binary_tree_item_t* a, genc_range_binary_tr
 		return 1;
 	return 0;
 }
+
+int genc_range_binary_tree_compare_ranges(genc_range_binary_tree_item_t* a, genc_range_binary_tree_item_t* b)
+{
+	return compare_ranges(a, b);
+}
+
 
 void genc_range_binary_tree_init(genc_binary_tree_t* tree)
 {

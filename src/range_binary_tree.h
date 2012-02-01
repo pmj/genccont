@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2011 Phil Jordan <phil@philjordan.eu>
+ Copyright (c) 2011-2012 Phil Jordan <phil@philjordan.eu>
  
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
@@ -49,6 +49,11 @@ struct genc_range_bt_node_range
 };
 typedef struct genc_range_bt_node_range genc_range_bt_node_range_t;
 
+
+/* Tests if two ranges overlap, and returns 0 if there is any overlap.
+ * -1 is returned if all of range a is below range b, and 1 is returned if all
+ * of range a falls above range b. */
+int genc_range_binary_tree_compare_ranges(genc_range_binary_tree_item_t* a, genc_range_binary_tree_item_t* b);
 
 void genc_range_binary_tree_init(genc_binary_tree_t* tree);
 

@@ -423,3 +423,14 @@ void genc_cht_verify(struct genc_chaining_hash_table* table)
 	}
 }
 
+genc_bool_t genc_cht_remove_item(struct genc_chaining_hash_table* table, genc_slist_head_t* item)
+{
+	genc_slist_head_t** found = genc_cht_find_ref(table, table->get_key_fn(item, table->opaque));
+	if (found && *found == item)
+	{
+		genc_cht_remove_ref(table, found);
+		return true;
+	}
+	return false;
+}
+

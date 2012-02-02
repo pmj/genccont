@@ -141,6 +141,11 @@ struct slist_head* genc_cht_remove_ref(struct genc_chaining_hash_table* table, s
 /* Calls genc_cht_find_ref() and calls genc_cht_remove_ref() with the result if a match was found. */
 struct slist_head* genc_cht_remove(struct genc_chaining_hash_table* table, void* key);
 
+/* Remove the given item from the table by calculating its key's hash, locating
+ * it in the bucket and unlinking it. Returns true if the item was indeed found
+ * and removed. */
+genc_bool_t genc_cht_remove_item(struct genc_chaining_hash_table* table, genc_slist_head_t* item);
+
 /* Shrink the capacity of the table by a factor of 1 << log2_shrink_factor */
 void genc_cht_shrink_by(struct genc_chaining_hash_table* table, unsigned log2_shrink_factor);
 /* Grow the capacity of the table by a factor of 1 << log2_grow_factor */
@@ -189,6 +194,9 @@ genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 
 #define genc_cht_find_obj(table, key, type, header_name) \
 genc_container_of(genc_cht_find((table), (key)), type, header_name)
+
+#define genc_cht_remove_obj(table, key, type, header_name) \
+	genc_container_of(genc_cht_remove((table), (key)), type, header_name)
 
 #define genc_cht_for_each_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR) \
 for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \

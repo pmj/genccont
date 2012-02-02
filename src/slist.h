@@ -89,6 +89,10 @@ struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_hea
  * elements encountered. Runtime is therefore O(N). */
 size_t genc_slist_length(struct slist_head* list);
 
+genc_bool_t genc_slist_is_empty(struct slist_head* list);
+
+genc_slist_head_t** genc_slist_find_ref(genc_slist_head_t* item, genc_slist_head_t** list);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

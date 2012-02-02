@@ -108,3 +108,18 @@ size_t genc_slist_length(struct slist_head* list)
 	return len;
 }
 
+genc_bool_t genc_slist_is_empty(genc_slist_head_t* list)
+{
+	return list == NULL;
+}
+
+genc_slist_head_t** genc_slist_find_ref(genc_slist_head_t* item, genc_slist_head_t** list)
+{
+	while (*list)
+	{
+		if (*list == item)
+			return list;
+		list = &(*list)->next;
+	}
+	return list;
+}

@@ -125,6 +125,9 @@ genc_bool_t genc_cht_insert_item(struct genc_chaining_hash_table* table, struct 
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */
 struct slist_head* genc_cht_find(struct genc_chaining_hash_table* table, void* key);
 
+/* Hashes the key and returns the bucket into which the key falls */
+struct slist_head** genc_cht_get_bucket_ref_for_key(struct genc_chaining_hash_table* table, void* key);
+
 /* Looks up the key in the table, returning the reference pointing to the
  * matching item, or something pointing to NULL if not found. The reference may be passed to
  * genc_cht_remove_ref() for efficient removal. */

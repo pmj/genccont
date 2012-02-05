@@ -76,11 +76,7 @@ typedef char genc_bool_t;
 #define GENC_UNUSED
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-	
-	
+
 	
 /** genc_container_of(obj, cont_type, member_name)
  * Get pointer to struct object from a pointer to one of its members.
@@ -98,18 +94,60 @@ extern "C" {
  * if obj is indeed NULL.
  */ 
 #ifndef genc_container_of
-	
+
+#ifndef __has_feature
+  #define __has_feature(x) 0
+#endif
+#ifndef __has_extension
+  #define __has_extension __has_feature
+#endif
+
+
+/* Where possible, make the helper functions const-correct via overloading */
+#if defined(__cplusplus) || __has_extension(attribute_overloadable)
+#ifdef __cplusplus
+#define GENC_OVERLOADABLE
+#else
+/* This is clang, basically */
+#define GENC_OVERLOADABLE __attribute__((overloadable))
+#endif
 	/* function for avoiding multiple evaluation */
-	static GENC_INLINE char* genc_container_of_helper(const void* obj, ptrdiff_t offset)
+	static inline void* GENC_OVERLOADABLE genc_container_of_helper(void* obj, ptrdiff_t offset)
+	{
+		return (obj ? ((char*)obj - offset) : NULL);
+	}
+	static inline const void* GENC_OVERLOADABLE genc_container_of_helper(const void* obj, ptrdiff_t offset)
+	{
+		return (obj ? ((const char*)obj - offset) : NULL);
+	}
+	/* function for avoiding multiple evaluation */
+	static inline const void* GENC_OVERLOADABLE genc_container_of_notnull_helper(const void* obj, ptrdiff_t offset)
+	{
+		return ((const char*)obj - offset);
+	}
+	static inline void* GENC_OVERLOADABLE genc_container_of_notnull_helper(void* obj, ptrdiff_t offset)
+	{
+		return ((char*)obj - offset);
+	}
+
+#else
+	/* function for avoiding multiple evaluation */
+	static GENC_INLINE void* genc_container_of_helper(const void* obj, ptrdiff_t offset)
 	{
 		return (obj ? ((char*)obj - offset) : NULL);
 	}
 	/* function for avoiding multiple evaluation */
-	static GENC_INLINE char* genc_container_of_notnull_helper(const void* obj, ptrdiff_t offset)
+	static GENC_INLINE void* genc_container_of_notnull_helper(const void* obj, ptrdiff_t offset)
 	{
 		return ((char*)obj - offset);
 	}
-	
+
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __GNUC__
 	
 	/* the unused _p attribute is for causing a compiler warning if member_name of

@@ -132,12 +132,12 @@ typedef char genc_bool_t;
 
 #else
 	/* function for avoiding multiple evaluation */
-	static GENC_INLINE void* genc_container_of_helper(const void* obj, ptrdiff_t offset)
+	static GENC_INLINE void* genc_container_of_helper(void* obj, ptrdiff_t offset)
 	{
 		return (obj ? ((char*)obj - offset) : NULL);
 	}
 	/* function for avoiding multiple evaluation */
-	static GENC_INLINE void* genc_container_of_notnull_helper(const void* obj, ptrdiff_t offset)
+	static GENC_INLINE void* genc_container_of_notnull_helper(void* obj, ptrdiff_t offset)
 	{
 		return ((char*)obj - offset);
 	}
@@ -174,7 +174,7 @@ _c; \
 ((cont_type*)genc_container_of_notnull_helper((obj), offsetof(cont_type, member_name)))
 #endif
 	
-	static GENC_INLINE void* genc_member_of_helper(const void* obj, ptrdiff_t offset)
+	static GENC_INLINE void* genc_member_of_helper(void* obj, ptrdiff_t offset)
 	{
 		return obj ? ((char*)obj + offset) : NULL;
 	}

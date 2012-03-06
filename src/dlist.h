@@ -38,6 +38,7 @@ struct dlist_head
 	struct dlist_head* next;
 	struct dlist_head* prev;
 };
+typedef struct dlist_head genc_dlist_head_t;
 
 /* Initialises an empty list. */
 void genc_dlist_init(struct dlist_head* head);

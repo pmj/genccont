@@ -80,6 +80,11 @@ int genc_dlist_is_empty(struct dlist_head* list);
  */
 struct dlist_head* genc_dlist_remove_last(struct dlist_head* list);
 
+/** Removes the list element at the start of the given list, or NULL if the list is empty
+ */
+struct dlist_head* genc_dlist_remove_first(struct dlist_head* list);
+
+
 /** Returns the last entry in the given list, or NULL if the list is empty */
 struct dlist_head* genc_dlist_last(struct dlist_head* list);
 
@@ -105,6 +110,9 @@ for ((removed_element = genc_dlist_is_empty(list_head) ? NULL : genc_dlist_remov
 
 #define genc_dlist_remove_last_object(list, list_type, list_head_member_name) \
 genc_container_of(genc_dlist_remove_last(list), list_type, list_head_member_name)
+
+#define genc_dlist_remove_first_object(list, list_type, list_head_member_name) \
+genc_container_of(genc_dlist_remove_first(list), list_type, list_head_member_name)
 
 #define genc_dlist_last_object(list, list_type, list_head_member_name) \
 genc_container_of(genc_dlist_last(list), list_type, list_head_member_name)

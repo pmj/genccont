@@ -96,3 +96,10 @@ struct dlist_head* genc_dlist_remove_last(struct dlist_head* list)
 		return NULL;
 	return genc_dlist_remove(list->prev);
 }
+
+struct dlist_head* genc_dlist_remove_first(struct dlist_head* list)
+{
+	if (genc_dlist_is_empty(list))
+		return NULL;
+	return genc_dlist_remove(list->next);
+}

@@ -101,7 +101,10 @@ genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GEN
 {
 	return *(uint64_t*)id1 == *(uint64_t*)id2;
 }
-
+genc_bool_t genc_uint32_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
+{
+	return *(uint32_t*)id1 == *(uint32_t*)id2;
+}
 
 
 /* Initialises the empty hash table with the given function implementations and capacity.

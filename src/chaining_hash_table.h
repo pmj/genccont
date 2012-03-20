@@ -185,6 +185,7 @@ static GENC_INLINE size_t genc_hash_size(size_t k)
 }
 
 size_t genc_uint32_key_hash(void* item, void* opaque_unused);
+genc_bool_t genc_uint32_keys_equal(void* id1, void* id2, void* opaque_unused);
 size_t genc_uint64_key_hash(void* item, void* opaque_unused);
 genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 

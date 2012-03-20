@@ -50,8 +50,6 @@ void* GENC_MEMSET(void *, int, size_t);
 #endif
 
 
-typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
-
 /* integer hashes described in http://www.cris.com/~Ttwang/tech/inthash.htm */
 size_t genc_hash_uint32(uint32_t key)
 {

@@ -167,7 +167,7 @@ struct genc_chaining_hash_table
 	uint8_t load_percent_grow_threshold;
 	uint8_t load_percent_shrink_threshold;
 };
-
+typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
 
 
 

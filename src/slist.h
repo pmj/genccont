@@ -232,4 +232,27 @@ for ((removed_element = genc_slist_remove_object_at((list_head), list_type, list
 genc_container_of(genc_slist_find_entry(((struct slist_head*)genc_member_of_helper((start), offsetof(list_type, list_head_member_name))), pred, data), list_type, list_head_member_name)
 
 
+struct genc_slist_stack_with_size
+{
+	struct slist_head* head;
+	size_t size;
+};
+typedef struct genc_slist_stack_with_size genc_slist_stack_with_size_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void genc_slist_stack_init(genc_slist_stack_with_size_t* stack);
+struct slist_head* genc_slist_stack_pop(genc_slist_stack_with_size_t* stack);
+void genc_slist_stack_push(genc_slist_stack_with_size_t* stack, struct slist_head* item);
+
+#define genc_slist_stack_pop_object(stack, item_type, item_head_member_name) \
+genc_container_of(genc_slist_stack_pop(stack), item_type, item_head_member_name)
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+
 #endif

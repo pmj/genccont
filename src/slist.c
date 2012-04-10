@@ -123,3 +123,24 @@ genc_slist_head_t** genc_slist_find_ref(genc_slist_head_t* item, genc_slist_head
 	}
 	return list;
 }
+
+void genc_slist_stack_init(genc_slist_stack_with_size_t* stack)
+{
+	stack->head = NULL;
+	stack->size = 0;
+}
+
+struct slist_head* genc_slist_stack_pop(genc_slist_stack_with_size_t* stack)
+{
+	genc_slist_head_t* item = genc_slist_remove_at(&stack->head);
+	if (item)
+		--stack->size;
+	return item;
+}
+
+void genc_slist_stack_push(genc_slist_stack_with_size_t* stack, struct slist_head* item)
+{
+	genc_slist_insert_at(item, &stack->head);
+	++stack->size;
+}
+

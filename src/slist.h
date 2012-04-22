@@ -247,6 +247,11 @@ void genc_slist_stack_init(genc_slist_stack_with_size_t* stack);
 struct slist_head* genc_slist_stack_pop(genc_slist_stack_with_size_t* stack);
 void genc_slist_stack_push(genc_slist_stack_with_size_t* stack, struct slist_head* item);
 
+static GENC_INLINE size_t genc_slist_stack_size(const genc_slist_stack_with_size_t* stack)
+{
+	return stack->size;
+}
+
 #define genc_slist_stack_pop_object(stack, item_type, item_head_member_name) \
 genc_container_of(genc_slist_stack_pop(stack), item_type, item_head_member_name)
 

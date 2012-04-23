@@ -103,7 +103,9 @@ typedef char genc_bool_t;
 #endif
 
 
-/* Where possible, make the helper functions const-correct via overloading */
+/* Where possible, make the helper functions const-correct via overloading.
+ * C++ compilers obviously support it, but so does clang. For pure GCC,
+ * we have a different solution. */
 #if defined(__cplusplus) || __has_extension(attribute_overloadable)
 #ifdef __cplusplus
 #define GENC_OVERLOADABLE
@@ -142,6 +144,21 @@ typedef char genc_bool_t;
 		return ((char*)obj - offset);
 	}
 
+#if __GNUC__
+	/* GNU C has some builtin trickery that is almost as good as overloading */
+	/* function for avoiding multiple evaluation */
+	static GENC_INLINE const void* genc_container_of_const_helper(const void* obj, ptrdiff_t offset)
+	{
+		return (obj ? ((const char*)obj - offset) : NULL);
+	}
+	/* function for avoiding multiple evaluation */
+	static GENC_INLINE const void* genc_container_of_const_notnull_helper(const void* obj, ptrdiff_t offset)
+	{
+		return ((const char*)obj - offset);
+	}
+
+#endif
+
 #endif
 
 #ifdef __cplusplus
@@ -149,7 +166,8 @@ extern "C" {
 #endif
 
 #ifdef __GNUC__
-	
+
+#if defined(__cplusplus) || __has_extension(attribute_overloadable)
 	/* the unused _p attribute is for causing a compiler warning if member_name of
 	 * cont_type does not have same type as target of obj*/
 #define genc_container_of(obj, cont_type, member_name) \
@@ -165,7 +183,34 @@ cont_type* _c = ((cont_type*)genc_container_of_notnull_helper((obj), offsetof(co
 __typeof__(obj) __attribute__ ((unused)) _p = &_c->member_name; \
 _c; \
 })
+
+#else
+
+/* GCC builtin trickery (C mode only, no overloading possible) so that different helpers
+ * get called for const and non-const types (avoids warnings even with -Wcast-qual).
+ * Checks if pointers to const type and type are compatible - only the case if
+ * type is already const - and dispatches to the 2 different helper functions. */
+#define genc_container_of(obj, cont_type, member_name) \
+({ \
+cont_type* _c = \
+	(cont_type*)(__builtin_choose_expr(__builtin_types_compatible_p(const cont_type*, cont_type*), \
+		genc_container_of_const_helper, genc_container_of_helper) \
+		((obj), offsetof(cont_type, member_name))); \
+__typeof__(obj) __attribute__ ((unused)) _p = _c ? &_c->member_name : NULL; \
+_c; \
+})
 	
+#define genc_container_of_notnull(obj, cont_type, member_name) \
+({ \
+cont_type* _c = \
+	(cont_type*)(__builtin_choose_expr(__builtin_types_compatible_p(const cont_type*, cont_type*), \
+		genc_container_of_const_notnull_helper, genc_container_of_notnull_helper) \
+			((obj), offsetof(cont_type, member_name))); \
+__typeof__(obj) __attribute__ ((unused)) _p = &_c->member_name; \
+_c; \
+})
+
+#endif
 	
 #else
 #define genc_container_of(obj, cont_type, member_name) \

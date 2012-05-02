@@ -144,3 +144,46 @@ void genc_slist_stack_push(genc_slist_stack_with_size_t* stack, struct slist_hea
 	++stack->size;
 }
 
+/* Given two finite lists with presumed common substructure, find that common tail.
+ * Runtime complexity: O(n)
+ * Returns the tail ref of list_a if no shared list elements. */
+struct genc_slist_ref_pair genc_slist_find_common_tail_refs(struct slist_head** list_a, struct slist_head** list_b)
+{
+	size_t len_a = genc_slist_length(*list_a);
+	size_t len_b = genc_slist_length(*list_b);
+	
+	/* Drop items off the front of one of the lists until they are the same length */
+	if (len_a > len_b)
+	{
+		while (len_a > len_b)
+		{
+			list_a = &(*list_a)->next;
+			--len_a;
+		}
+	}
+	else
+	{
+		while (len_b > len_a)
+		{
+			list_b = &(*list_b)->next;
+			--len_b;
+		}
+	}
+	
+	/* Locate the first common node */
+	while (*list_a && (*list_a) != (*list_b))
+	{
+		list_a = &(*list_a)->next;
+		list_b = &(*list_b)->next;
+	}
+	
+	struct genc_slist_ref_pair pair = {{ list_a, list_b }};
+	return pair;
+}
+
+/* Given two finite lists with presumed common substructure, find that common tail.
+ * Runtime complexity: O(n); returns NULL if no common tail */
+struct slist_head* genc_slist_find_common_tail(struct slist_head* list_a, struct slist_head* list_b)
+{
+	return *(genc_slist_find_common_tail_refs(&list_a, &list_b).refs[0]);
+}

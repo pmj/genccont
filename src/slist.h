@@ -89,6 +89,18 @@ struct slist_head** genc_slist_splice(struct slist_head** into, struct slist_hea
  * elements encountered. Runtime is therefore O(N). */
 size_t genc_slist_length(struct slist_head* list);
 
+struct genc_slist_ref_pair
+{
+	struct slist_head** refs[2];
+};
+/* Given two finite lists with presumed common substructure, find the links pointing to that common tail.
+ * Runtime complexity: O(n)
+ */
+struct genc_slist_ref_pair genc_slist_find_common_tail_refs(struct slist_head** list_a, struct slist_head** list_b);
+/* Given two finite lists with presumed common substructure, find that common tail.
+ * Runtime complexity: O(n); returns NULL if no common tail */
+struct slist_head* genc_slist_find_common_tail(struct slist_head* list_a, struct slist_head* list_b);
+
 genc_bool_t genc_slist_is_empty(struct slist_head* list);
 
 genc_slist_head_t** genc_slist_find_ref(genc_slist_head_t* item, genc_slist_head_t** list);

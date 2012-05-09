@@ -88,6 +88,9 @@ struct dlist_head* genc_dlist_remove_first(struct dlist_head* list);
 /** Returns the last entry in the given list, or NULL if the list is empty */
 struct dlist_head* genc_dlist_last(struct dlist_head* list);
 
+/** Number of elements in the list, NOT including the head element. */
+size_t genc_dlist_length(struct dlist_head* list);
+
 /** genc_dlist_remove_object(entry, list_type, list_head_member_name)
  * Typed version of genc_dlist_remove_at(). */
 #define genc_dlist_remove_object(entry, list_type, list_head_member_name) \

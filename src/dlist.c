@@ -103,3 +103,16 @@ struct dlist_head* genc_dlist_remove_first(struct dlist_head* list)
 		return NULL;
 	return genc_dlist_remove(list->next);
 }
+
+size_t genc_dlist_length(struct dlist_head* list)
+{
+	struct dlist_head* cur = list->next;
+	size_t length = 0;
+	while (cur != list)
+	{
+		++length;
+		cur = cur->next;
+	}
+	return length;
+}
+

@@ -168,7 +168,7 @@ extern "C" {
 #ifdef __GNUC__
 
 #if defined(__cplusplus) || __has_extension(attribute_overloadable)
-	/* the unused _p attribute is for causing a compiler warning if member_name of
+	/* the unused _p variable is for causing a compiler warning if member_name of
 	 * cont_type does not have same type as target of obj*/
 #define genc_container_of(obj, cont_type, member_name) \
 ({ \
@@ -218,12 +218,7 @@ _c; \
 #define genc_container_of_notnull(obj, cont_type, member_name) \
 ((cont_type*)genc_container_of_notnull_helper((obj), offsetof(cont_type, member_name)))
 #endif
-	
-	static GENC_INLINE void* genc_container_of_helper(void* obj, ptrdiff_t offset)
-	{
-		return obj ? ((char*)obj + offset) : NULL;
-	}
-	
+
 #endif
 	
 #ifdef __cplusplus

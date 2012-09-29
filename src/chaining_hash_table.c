@@ -400,7 +400,7 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 					if (idx == i)
 						break;
 					/* remove from chain, add to new bucket */
-					genc_slist_head_t* rem = genc_slist_remove_at(cur_ref);
+					genc_slist_head_t* rem GENC_UNUSED = genc_slist_remove_at(cur_ref);
 					assert(rem == cur);
 					genc_slist_insert_at(cur, buckets + idx);
 					cur = *cur_ref;
@@ -416,10 +416,10 @@ void genc_cht_verify(struct genc_chaining_hash_table* table)
 	size_t bucket = 0;
 	genc_slist_head_t** bucket_head = NULL;
 	genc_slist_head_t* entry = NULL;
-	genc_hash_t mask = table->capacity - 1;
+	genc_hash_t mask GENC_UNUSED = table->capacity - 1;
 	genc_cht_for_each_ref(table, entry, bucket_head, bucket)
 	{
-		genc_hash_t hash = table->hash_fn(table->get_key_fn(entry, table->opaque), table->opaque);
+		genc_hash_t hash GENC_UNUSED = table->hash_fn(table->get_key_fn(entry, table->opaque), table->opaque);
 		assert((hash & mask) == bucket);
 	}
 }

@@ -118,7 +118,7 @@ void genc_range_bt_split_range(
 	new_range->range_start = split_at;
 	existing_range->range_end = split_at;
 	
-	int ok = genc_range_bt_insert(tree, new_range);
+	int ok GENC_UNUSED = genc_range_bt_insert(tree, new_range);
 	assert(ok);
 }
 

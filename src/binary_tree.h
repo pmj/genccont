@@ -82,6 +82,10 @@ genc_bt_node_head_t* genc_bt_find(genc_binary_tree_t* tree, genc_bt_node_head_t*
 /* Tries to find a node in the tree with the greatest key less than or equal to
  * item's. If the tree contains no such node, NULL is returned. */
 genc_bt_node_head_t* genc_bt_find_or_lower(genc_binary_tree_t* tree, genc_bt_node_head_t* item); 
+/* Tries to find a node in the tree with the smallest key greater than or equal to
+ * item's. If the tree contains no such node, NULL is returned. */
+genc_bt_node_head_t* genc_bt_find_or_higher(genc_binary_tree_t* tree, genc_bt_node_head_t* item);
+
 /*genc_bt_node_head_t* genc_bt_find_or_higher(genc_binary_tree_t* tree, genc_bt_node_head_t* item);*/
 genc_bt_node_head_t* genc_bt_first_item(genc_binary_tree_t* tree);
 genc_bt_node_head_t* genc_bt_next_item(genc_binary_tree_t* tree, genc_bt_node_head_t* after_item);
@@ -100,6 +104,9 @@ genc_bool_t genc_bt_is_empty(genc_binary_tree_t* tree);
 
 #define genc_bt_find_obj_or_lower(tree, item, type, member) \
 	genc_container_of(genc_bt_find_or_lower(tree, &(item)->member), type, member)
+
+#define genc_bt_find_obj_or_higher(tree, item, type, member) \
+	genc_container_of(genc_bt_find_or_higher(tree, &(item)->member), type, member)
 
 #define genc_bt_next_obj(tree, item, type, member) \
 	genc_container_of(genc_bt_next_item(tree, &(item)->member), type, member)

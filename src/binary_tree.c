@@ -276,6 +276,33 @@ genc_bt_node_head_t* genc_bt_find_or_lower(genc_binary_tree_t* tree, genc_bt_nod
 	}
 }
 
+genc_bt_node_head_t* genc_bt_find_or_higher(genc_binary_tree_t* tree, genc_bt_node_head_t* item)
+{
+	genc_bt_node_head_t* parent = NULL;
+	genc_bt_node_head_t** found = genc_bt_find_insertion_point(tree, item, &parent);
+	if (*found)
+	{
+		/* exact match */
+		return *found;
+	}
+	else if (!parent)
+	{
+		/* tree is empty so far */
+		return NULL;
+	}
+	else if (tree->less_fn(parent, item, tree->less_fn_opaque))
+	{
+		/* parent is lower than item, find the next higher entry */
+		return genc_bt_next_item(tree, parent);
+	}
+	else
+	{
+		/* parent is greater than item */
+		return parent;
+	}
+}
+
+
 void genc_bt_swap_trees(genc_binary_tree_t* tree_a, genc_binary_tree_t* tree_b)
 {
 	genc_binary_tree_t temp = *tree_a;

@@ -234,14 +234,15 @@ for ((removed_element = genc_slist_remove_object_at((list_head), list_type, list
  * }
  */
 
-/** genc_slist_find_object(start_obj, list_type, list_head_member_name, pred, data)
+/** genc_slist_find_object(list, list_type, list_head_member_name, pred, data)
  * Typed version of genc_slist_find_entry 
  * Locates a specific list entry based on the given predicate function.
  * Returns a pointer to the first matched element, or NULL if none is found.
- * start_obj may be NULL, in which case NULL is returned.
+ * list may be NULL, in which case NULL is returned.
+ * list must be of type genc_slist_head_t*
  */
-#define genc_slist_find_obj(start, list_type, list_head_member_name, pred, data) \
-genc_container_of(genc_slist_find_entry(((struct slist_head*)genc_member_of_helper((start), offsetof(list_type, list_head_member_name))), pred, data), list_type, list_head_member_name)
+#define genc_slist_find_obj(list, list_type, list_head_member_name, pred, data) \
+genc_container_of(genc_slist_find_entry(list, pred, data), list_type, list_head_member_name)
 
 
 struct genc_slist_stack_with_size

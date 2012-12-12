@@ -77,8 +77,11 @@ typedef genc_bool_t(*genc_chaining_hash_key_equality_fn)(void* key1, void* key2,
  * Additionally, if the table should have a fixed size, disable shrinking by
  * setting the shrink threshold to 0 and prevent growing by returning NULL from
  * the realloc function when old_size > 0 && new_size > 0. You're still expected
- * to provide the initial memory. */
-typedef void*(*genc_realloc_fn)(void* old_ptr, size_t old_size, size_t new_size);
+ * to provide the initial memory.
+ * Opaque is just passed through from the hash table and can be used for
+ * selecting a memory pool, etc.
+ */
+typedef void*(*genc_realloc_fn)(void* old_ptr, size_t old_size, size_t new_size, void* opaque);
 
 struct genc_chaining_hash_table;
 

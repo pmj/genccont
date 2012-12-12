@@ -142,7 +142,7 @@ genc_bool_t genc_chaining_hash_table_init_ext(
 	void* buckets;
 	if (!genc_is_pow2(initial_capacity_pow2))
 		return 0;
-	buckets = realloc_fn(NULL, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*));
+	buckets = realloc_fn(NULL, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*), opaque);
 	if (!buckets)
 		return 0;
 	GENC_MEMSET(buckets, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*));
@@ -178,7 +178,7 @@ void genc_cht_destroy(struct genc_chaining_hash_table* table)
 {
 	if (table->buckets)
 	{
-		table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), 0);
+		table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), 0, table->opaque);
 		table->buckets = NULL;
 		table->capacity = 0;
 		table->item_count = 0;
@@ -348,7 +348,7 @@ void genc_cht_shrink_by(struct genc_chaining_hash_table* table, unsigned log2_sh
 		}
 	}
 	
-	table->buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*)));
+	table->buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*), table->opaque));
 	table->capacity = new_capacity;
 }
 
@@ -367,7 +367,7 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 	if (new_capacity == table->capacity)
 		return;
 
-	buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*)));
+	buckets = GENC_CXX_CAST(genc_slist_head_t**, table->realloc_fn(table->buckets, table->capacity * sizeof(genc_slist_head_t*), new_capacity * sizeof(genc_slist_head_t*), table->opaque));
 	if (!buckets)
 		return;
 		

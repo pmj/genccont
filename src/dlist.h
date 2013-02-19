@@ -48,7 +48,7 @@ void genc_dlist_head_zero(struct dlist_head* head);
 
 
 /* predicate function type for filtering list entries, returns 0 for no match, non-0 for match */
-typedef int (*genc_dlist_entry_pred_fn)(struct dlist_head* entry, void* data);
+typedef genc_bool_t(*genc_dlist_entry_pred_fn)(struct dlist_head* entry, void* data);
 
 /** Locates a specific list entry based on the given predicate function.
  * Returns a pointer to the first matched element, or NULL if none is found.

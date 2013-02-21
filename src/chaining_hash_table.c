@@ -187,7 +187,7 @@ void genc_cht_destroy(struct genc_chaining_hash_table* table)
 
 static GENC_INLINE int genc_log2_size(size_t val)
 {
-	return val == 0 ? -1 : (int)(sizeof(size_t) * 8 - 1 - __builtin_clzll(val));
+	return val == 0 ? -1 : (int)(sizeof(size_t) * 8 - 1 - __builtin_clzl(val));
 }
 
 static GENC_INLINE int genc_log2_size_roundup(size_t val)

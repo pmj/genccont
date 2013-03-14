@@ -58,6 +58,13 @@ typedef genc_bool_t(*genc_dlist_entry_pred_fn)(struct dlist_head* entry, void* d
  */
 struct dlist_head* genc_dlist_find_in_range(struct dlist_head* start_after, struct dlist_head* end_before, genc_dlist_entry_pred_fn pred, void* data);
 
+/** Locates a specific list entry based on the given predicate function.
+ * Returns a pointer to the first matched element, or NULL if none is found.
+ * Searches all items except the specific one passed as list, as this is assumed
+ * to be the list anchoring dummy element.
+ */
+struct dlist_head* genc_dlist_find_in_list(struct dlist_head* list, genc_dlist_entry_pred_fn pred, void* data);
+
 /** Inserts a single new list element before the given list element.
  * Appending to the end of a list is done by inserting before the list's head.
  */
@@ -122,6 +129,15 @@ genc_container_of(genc_dlist_last(list), list_type, list_head_member_name)
 
 #define genc_dlist_insert_object_after(new_entry, after, list_head_member_name) \
 genc_dlist_insert_after(&((new_entry)->list_head_member_name), &((after)->list_head_member_name))
+
+#define genc_dlist_find_object_in_range(start_after, end_before, pred_fn, pred_data, list_type, list_head_member_name) \
+genc_container_of( \
+  genc_dlist_find_in_range(start_after, end_before, pred_fn, pred_data), list_type, list_head_member_name);
+
+#define genc_dlist_find_object_in_list(list, pred_fn, pred_data, list_type, list_head_member_name) \
+genc_container_of( \
+  genc_dlist_find_in_list(list, pred_fn, pred_data), list_type, list_head_member_name);
+
 
 #ifdef __cplusplus
 } /* extern "C" */

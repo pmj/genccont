@@ -116,3 +116,8 @@ size_t genc_dlist_length(struct dlist_head* list)
 	return length;
 }
 
+struct dlist_head* genc_dlist_find_in_list(struct dlist_head* list, genc_dlist_entry_pred_fn pred, void* data)
+{
+	return genc_dlist_find_in_range(list, list, pred, data);
+}
+

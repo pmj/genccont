@@ -50,63 +50,6 @@ void* GENC_MEMSET(void *, int, size_t);
 #endif
 
 
-/* integer hashes described in http://www.cris.com/~Ttwang/tech/inthash.htm */
-size_t genc_hash_uint32(uint32_t key)
-{
-  key = ~key + (key << 15);
-  key = key ^ (key >> 12);
-  key = key + (key << 2);
-  key = key ^ (key >> 4);
-  key = key * 2057;
-  key = key ^ (key >> 16);
-  return key;
-}
-
-#ifdef __LP64__
-/* 64 bit -> 64 bit hash */
-size_t genc_hash_uint64(uint64_t key)
-{
-  key = (~key) + (key << 21);
-  key = key ^ (key >> 24);
-  key = (key + (key << 3)) + (key << 8);
-  key = key ^ (key >> 14);
-  key = (key + (key << 2)) + (key << 4);
-  key = key ^ (key >> 28);
-  key = key + (key << 31);
-  return key;
-}
-#else
-size_t genc_hash_uint64(uint64_t key)
-{
-  key = (~key) + (key << 18);
-  key = key ^ (key >> 31);
-  key = key * 21;
-  key = key ^ (key >> 11);
-  key = key + (key << 6);
-  key = key ^ (key >> 22);
-  return (size_t)key;
-}
-#endif
-
-
-size_t genc_uint32_key_hash(void* item, void* opaque_unused GENC_UNUSED)
-{
-	return genc_hash_uint32(*(uint32_t*)item);
-}
-size_t genc_uint64_key_hash(void* item, void* opaque_unused GENC_UNUSED)
-{
-	return genc_hash_uint64(*(uint64_t*)item);
-}
-genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
-{
-	return *(uint64_t*)id1 == *(uint64_t*)id2;
-}
-genc_bool_t genc_uint32_keys_equal(void* id1, void* id2, void* opaque_unused GENC_UNUSED)
-{
-	return *(uint32_t*)id1 == *(uint32_t*)id2;
-}
-
-
 /* Initialises the empty hash table with the given function implementations and capacity.
  * Defaults (70, 0) are used for load factor percentage thresholds for growing and shrinking. */
 genc_bool_t genc_chaining_hash_table_init(
@@ -119,11 +62,6 @@ genc_bool_t genc_chaining_hash_table_init(
 	size_t initial_capacity_pow2)
 {
 	return genc_chaining_hash_table_init_ext(table, hash_fn, get_key_fn, key_equality_fn, realloc_fn, opaque, initial_capacity_pow2, 70, 0);
-}
-
-static GENC_INLINE int genc_is_pow2(size_t val)
-{
-	return val != 0ul && 0ul == (val & (val - 1ul));
 }
 
 
@@ -142,6 +80,8 @@ genc_bool_t genc_chaining_hash_table_init_ext(
 	void* buckets;
 	if (!genc_is_pow2(initial_capacity_pow2))
 		return 0;
+	if (SIZE_MAX / sizeof(genc_slist_head_t*) < initial_capacity_pow2)
+		return 0; // overflow
 	buckets = realloc_fn(NULL, 0, initial_capacity_pow2 * sizeof(genc_slist_head_t*), opaque);
 	if (!buckets)
 		return 0;
@@ -185,17 +125,6 @@ void genc_cht_destroy(struct genc_chaining_hash_table* table)
 	}
 }
 
-static GENC_INLINE int genc_log2_size(size_t val)
-{
-	return val == 0 ? -1 : (int)(sizeof(size_t) * 8 - 1 - __builtin_clzl(val));
-}
-
-static GENC_INLINE int genc_log2_size_roundup(size_t val)
-{
-	int log2 = genc_log2_size(val);
-	if (genc_is_pow2(val)) return log2;
-	return log2 + 1;
-}
 
 struct genc_cht_match_ctx
 {

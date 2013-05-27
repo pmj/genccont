@@ -36,6 +36,8 @@ freely, subject to the following restrictions:
 /* Chaining is done with singly linked list */
 #include "slist.h"
 
+#include "hash_shared.h"
+
 #if defined(KERNEL) && defined(APPLE)
 /* xnu kernel */
 /* xnu for some reason doesn't typedef ptrdiff_t. To avoid stepping on toes,
@@ -49,19 +51,9 @@ freely, subject to the following restrictions:
 extern "C" {
 #endif
 
-/* Hash values are expected to span the entire address space or the key space,
- * whichever is smaller.
- * (i.e. it's okay to produce 32-bit hash values on a 64-bit
- * system if there are only 1<<32 unique keys) */
-typedef size_t genc_hash_t;
-
-/* Client functions supplied to the library may accept an additional opaque
- * pointer for parameterisation. None of the functions may return different
- * results for the same inputs at different times. */
-
 /* key hashing function to be implemented by the client; will be passed pointer
  * to the key extracted from an item or passed to the library directly */
-typedef genc_hash_t(*genc_chaining_key_hash_fn)(void* item, void* opaque);
+typedef genc_key_hash_fn genc_chaining_key_hash_fn;
 
 /* key accessor function - extracts pointer to the key from the item whose
  * chaining head is passed in */
@@ -69,19 +61,7 @@ typedef void*(*genc_chaining_hash_get_item_key_fn)(struct slist_head* item, void
 
 /* key-key equality function to be implemented by the client
  * Shall return false(0) for inequality and true(1) for equality. */
-typedef genc_bool_t(*genc_chaining_hash_key_equality_fn)(void* key1, void* key2, void* opaque);
-
-/* memory re-allocation function. Semantics similar to C's realloc(), copying allowed.
- * new_size = 0 frees memory
- * old_size = 0 allocates a new block.
- * Additionally, if the table should have a fixed size, disable shrinking by
- * setting the shrink threshold to 0 and prevent growing by returning NULL from
- * the realloc function when old_size > 0 && new_size > 0. You're still expected
- * to provide the initial memory.
- * Opaque is just passed through from the hash table and can be used for
- * selecting a memory pool, etc.
- */
-typedef void*(*genc_realloc_fn)(void* old_ptr, size_t old_size, size_t new_size, void* opaque);
+typedef genc_hash_key_equality_fn genc_chaining_hash_key_equality_fn;
 
 struct genc_chaining_hash_table;
 
@@ -172,25 +152,6 @@ struct genc_chaining_hash_table
 };
 typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
 
-
-
-/* Useful integer hash functions, not used directly but can be used to implement
- * client hash functions */
-size_t genc_hash_uint32(uint32_t k);
-size_t genc_hash_uint64(uint64_t k);
-static GENC_INLINE size_t genc_hash_size(size_t k)
-{
-#if defined(__LP64__) || defined(_WIN64)
-	return genc_hash_uint64(k);
-#else
-	return genc_hash_uint32(k);
-#endif
-}
-
-size_t genc_uint32_key_hash(void* item, void* opaque_unused);
-genc_bool_t genc_uint32_keys_equal(void* id1, void* id2, void* opaque_unused);
-size_t genc_uint64_key_hash(void* item, void* opaque_unused);
-genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 
 #ifdef __cplusplus
 } /* extern "C" */

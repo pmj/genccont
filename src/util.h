@@ -229,4 +229,10 @@ _c; \
 #undef ptrdiff_t
 #endif
 
+#ifdef __cplusplus
+#define GENC_CXX_CAST(TYPE, EXPR) static_cast<TYPE>(EXPR)
+#else
+#define GENC_CXX_CAST(TYPE, EXPR) (EXPR)
+#endif
+
 #endif

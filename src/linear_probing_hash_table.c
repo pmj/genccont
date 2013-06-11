@@ -1,15 +1,6 @@
 #include "linear_probing_hash_table.h"
 #include <string.h>
 
-// cast from void* to some other pointer type. Implicit in C, explicit in C++.
-#ifdef __cplusplus
-#define GENC_CXX_CAST(type, ptr) static_cast<type>(ptr)
-#elif defined(__GNUC__)
-#define GENC_CXX_CAST(type, ptr) ({ type _tmp = (ptr); _tmp; })
-#else
-#define GENC_CXX_CAST(type, ptr) (ptr)
-#endif
-
 /* Initialises the empty hash table with the given function implementations and capacity.
  * Defaults (70, 0) are used for load factor percentage thresholds for growing and shrinking. */
 genc_bool_t genc_linear_probing_hash_table_init(
@@ -129,7 +120,8 @@ static void* genc_lpht_find_or_empty(
 	genc_hash_t idx = start_idx;
 	do
 	{
-		char* bucket = GENC_CXX_CAST(char*, table->buckets) + table->bucket_size * idx;
+		char* bucket = GENC_CXX_CAST(char*, table->buckets);
+		bucket += table->bucket_size * idx;
 		
 		// stop if bucket is empty or if we found an item which matches key
 		if (table->item_empty_fn(bucket, table->opaque))

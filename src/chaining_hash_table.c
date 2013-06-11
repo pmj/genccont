@@ -43,13 +43,6 @@ void* GENC_MEMSET(void *, int, size_t);
 #define GENC_MEMSET memset
 #endif
 
-#ifdef __cplusplus
-#define GENC_CXX_CAST(TYPE, EXPR) static_cast<TYPE>(EXPR)
-#else
-#define GENC_CXX_CAST(TYPE, EXPR) (EXPR)
-#endif
-
-
 /* Initialises the empty hash table with the given function implementations and capacity.
  * Defaults (70, 0) are used for load factor percentage thresholds for growing and shrinking. */
 genc_bool_t genc_chaining_hash_table_init(

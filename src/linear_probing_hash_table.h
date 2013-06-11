@@ -99,8 +99,9 @@ size_t genc_lpht_capacity(struct genc_linear_probing_hash_table* table);
 void genc_lpht_destroy(struct genc_linear_probing_hash_table* table);
 
 /* Inserts the given item into the hash table.
- * Returns false/0 to report failure due to a duplicate or growth failure, true/1 on success. */
-genc_bool_t genc_lpht_insert_item(
+ * Returns NULL to report failure due to a duplicate or growth failure, pointer
+ * to inserted bucket on success. */
+void* genc_lpht_insert_item(
 	struct genc_linear_probing_hash_table* table, void* item);
 
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */

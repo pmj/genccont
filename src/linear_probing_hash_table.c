@@ -142,7 +142,7 @@ static void* genc_lpht_find_or_empty(
 }
 
 // pure insertion, without the bookkeeping
-static genc_bool_t genc_lpht_insert_item_into_table(
+static void* genc_lpht_insert_item_into_table(
 	struct genc_linear_probing_hash_table* table, void* item)
 {
 	void* item_key = table->get_key_fn(item, table->opaque);
@@ -150,16 +150,17 @@ static genc_bool_t genc_lpht_insert_item_into_table(
 	void* bucket = genc_lpht_find_or_empty(table, item_key, &found);
 	
 	if (!bucket || found)
-		return false; // table is full, or item exists
+		return NULL; // table is full, or item exists
 	
 	// insert the item
 	memcpy(bucket, item, table->bucket_size);
-	return true;
+	return bucket;
 }
 
 /* Inserts the given item into the hash table.
- * Returns false/0 to report failure due to a duplicate or growth failure, true/1 on success. */
-genc_bool_t genc_lpht_insert_item(
+ * Returns NULL to report failure due to a duplicate or growth failure, pointer
+ * to inserted bucket on success. */
+void* genc_lpht_insert_item(
 	struct genc_linear_probing_hash_table* table, void* item)
 {
 	unsigned new_load;

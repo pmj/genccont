@@ -139,6 +139,19 @@ genc_container_of( \
   genc_dlist_find_in_list(list, pred_fn, pred_data), list_type, list_head_member_name);
 
 
+/** Iterate over all elements in a list (except for the list head)
+ * type - (struct/union) type of each object
+ * member - member name of genc_dlist_head_t element in type. May be nested (e.g. foo[2].bar)
+ * var - name of the loop variable (will be declared as type*, with for loop scope)
+ * list_head - pointer to genc_dlist_head_t
+ */
+#define genc_dlist_for_each_object(type, member, var, list_head) \
+for ( \
+	type* var = genc_container_of_notnull(((list_head)->next), type, member); \
+	&var->member != (list_head); \
+	v = genc_container_of_notnull(v->member.next, type, member))
+
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

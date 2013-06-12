@@ -399,3 +399,41 @@ genc_bool_t genc_lpht_verify(struct genc_linear_probing_hash_table* table)
 	}
 	return true;
 }
+
+void* genc_lpht_first_item(struct genc_linear_probing_hash_table* table)
+{
+	const size_t capacity = table->capacity;
+	const size_t bucket_size = table->bucket_size;
+	const genc_item_is_empty_fn item_empty_fn = table->item_empty_fn;
+	void* const opaque = table->opaque;
+
+	char* bucket = GENC_CXX_CAST(char*, table->buckets);
+
+	for (genc_hash_t idx = 0; idx < capacity; ++idx, bucket += bucket_size)
+	{
+		if (!item_empty_fn(bucket, opaque))
+			return bucket;
+	}
+	return NULL;
+}
+/* Next non-empty bucket */
+void* genc_lpht_next_item(struct genc_linear_probing_hash_table* table, void* cur_item)
+{
+	const size_t capacity = table->capacity;
+	const size_t bucket_size = table->bucket_size;
+	const genc_item_is_empty_fn item_empty_fn = table->item_empty_fn;
+	void* const opaque = table->opaque;
+
+	char* bucket = GENC_CXX_CAST(char*, cur_item);
+
+	char* end = GENC_CXX_CAST(char*, table->buckets);
+	end += capacity * bucket_size;
+
+	for (; bucket < end; bucket += bucket_size)
+	{
+		if (!item_empty_fn(bucket, opaque))
+			return bucket;
+	}
+	return NULL;
+}
+

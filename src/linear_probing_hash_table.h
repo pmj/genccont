@@ -124,6 +124,13 @@ void genc_lpht_grow_by(struct genc_linear_probing_hash_table* table, unsigned lo
 /* Walks all the elements in the hash table and checks they're still in the correct bucket. */
 genc_bool_t genc_lpht_verify(struct genc_linear_probing_hash_table* table);
 
+/* Iterating over all the items in the table: */
+
+/* First non-empty bucket. */
+void* genc_lpht_first_item(struct genc_linear_probing_hash_table* table);
+/* Next non-empty bucket */
+void* genc_lpht_next_item(struct genc_linear_probing_hash_table* table, void* cur_item);
+
 struct genc_linear_probing_hash_table
 {
 	genc_key_hash_fn hash_fn;

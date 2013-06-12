@@ -177,11 +177,12 @@ void* genc_lpht_insert_item(
 		genc_lpht_grow_by(table, factor_log2);
 	}
 	
-	if (!genc_lpht_insert_item_into_table(table, item))
-		return false;
+	void* inserted = genc_lpht_insert_item_into_table(table, item);
+	if (!inserted)
+		return NULL;
 	
 	++table->item_count;
-	return true;
+	return inserted;
 }
 
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */

@@ -98,6 +98,43 @@ struct dlist_head* genc_dlist_last(struct dlist_head* list);
 /** Number of elements in the list, NOT including the head element. */
 size_t genc_dlist_length(struct dlist_head* list);
 
+/** genc_dlist_splice:
+ * Remove a subrange of one list and insert it into another list, after the
+ * specified item.
+ *
+ * For example, say we have these 2 lists:
+ * 1: -> H1 <-> A <-> B <-> C <-
+ * 2: -> H2 <-> D <-> E <-> F <-> G <-
+ * 
+ * And we call genc_dlist_splice(A, D, G), we end up with:
+ *
+ * 1: -> H1 <-> A <-> E <-> F <-> B <-> C <-
+ * 2: -> H2 <-> D <-> G <-
+ *
+ * These semantics might seem odd, but they make it really easy to concatenate a
+ * whole list. E.g. same initial condition as above, call:
+ * genc_dlist_splice(H1, H2, H2)
+ * and we end up with:
+ * 1: -> H1 <-> D <-> E <-> F <-> G <-> A <-> B <-> C <-
+ * 2: -> H2 <-
+ */
+void genc_dlist_splice(
+	genc_dlist_head_t* into_after, genc_dlist_head_t* from_after, genc_dlist_head_t* from_before);
+
+/* Similar to genc_dlist_splice but inserts into the destination list before the
+ * specified element.
+ * This is a helper to facilitate the following semantics (i.e. appending):
+ *
+ * 1: -> H1 <-> A <-> B <-> C <-
+ * 2: -> H2 <-> D <-> E <-> F <-> G <-
+ * genc_dlist_splice(H1, H2, H2)
+ * 1: -> H1 <-> A <-> B <-> C <-> D <-> E <-> F <-> G <-
+ * 2: -> H2 <-
+ */
+void genc_dlist_splice_before(
+	genc_dlist_head_t* into_before, genc_dlist_head_t* from_after, genc_dlist_head_t* from_before);
+
+
 /** genc_dlist_remove_object(entry, list_type, list_head_member_name)
  * Typed version of genc_dlist_remove_at(). */
 #define genc_dlist_remove_object(entry, list_type, list_head_member_name) \

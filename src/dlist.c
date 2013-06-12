@@ -121,3 +121,70 @@ struct dlist_head* genc_dlist_find_in_list(struct dlist_head* list, genc_dlist_e
 	return genc_dlist_find_in_range(list, list, pred, data);
 }
 
+struct genc_dlist_range
+{
+	genc_dlist_head_t* first;
+	genc_dlist_head_t* last;
+};
+typedef struct genc_dlist_range genc_dlist_range_t;
+
+static genc_dlist_range_t genc_dlist_remove_range(genc_dlist_head_t* after, genc_dlist_head_t* before)
+{
+	genc_dlist_head_t* first = after->next;
+	genc_dlist_head_t* last = before->prev;
+	genc_dlist_range_t removed = { NULL, NULL };
+	if (first == before)
+	{
+		// no-op, trying to splice a zero-length sublist
+		assert(last == after);
+		return removed;
+	}
+	
+	after->next = before;
+	before->prev = after;
+	
+	first->prev = NULL;
+	last->next = NULL;
+	
+	removed.first = first;
+	removed.last = last;
+	return removed;
+}
+
+static void genc_dlist_insert_range_after(genc_dlist_range_t range, struct dlist_head* after)
+{
+	range.first->prev = after;
+	range.last->next = after->next;
+	after->next->prev = range.last;
+	after->next = range.first;
+}
+
+
+void genc_dlist_splice(
+	genc_dlist_head_t* into_after, genc_dlist_head_t* from_after, genc_dlist_head_t* from_before)
+{
+	genc_dlist_range_t range = genc_dlist_remove_range(from_after, from_before);
+	if (range.first == NULL)
+		return;
+	
+	genc_dlist_insert_range_after(range, into_after);
+}
+
+static void genc_dlist_insert_range_before(genc_dlist_range_t range, struct dlist_head* before)
+{
+	range.last->next = before;
+	range.first->prev = before->prev;
+	before->prev->next = range.first;
+	before->prev = range.last;
+}
+
+void genc_dlist_splice_before(
+	genc_dlist_head_t* into_before, genc_dlist_head_t* from_after, genc_dlist_head_t* from_before)
+{
+	genc_dlist_range_t range = genc_dlist_remove_range(from_after, from_before);
+	if (range.first == NULL)
+		return;
+	
+	genc_dlist_insert_range_before(range, into_before);
+}
+

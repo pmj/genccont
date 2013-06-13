@@ -22,6 +22,9 @@ freely, subject to the following restrictions:
 */
 
 #include "dlist.h"
+#ifndef KERNEL
+#include <assert.h>
+#endif
 
 void genc_dlist_init(struct dlist_head* head)
 {

@@ -427,6 +427,7 @@ void* genc_lpht_next_item(struct genc_linear_probing_hash_table* table, void* cu
 	char* end = GENC_CXX_CAST(char*, table->buckets);
 	end += capacity * bucket_size;
 
+	bucket += bucket_size;
 	for (; bucket < end; bucket += bucket_size)
 	{
 		if (!item_empty_fn(bucket, opaque))

@@ -203,14 +203,14 @@ genc_hash_t genc_lpht_get_bucket_for_key(
 }
 
 static GENC_INLINE genc_bool_t idx_between(
-	genc_hash_t idx, genc_hash_t start_exc, genc_hash_t end_exc, genc_hash_t capacity)
+	genc_hash_t idx, genc_hash_t start_inc, genc_hash_t end_exc, genc_hash_t capacity)
 {
 	genc_hash_t mask = capacity - 1;
 	// calculate distances idx->end_exc and start_exc->end_exc using modular arithmetic
 	genc_hash_t idx_delta = (end_exc - idx) & mask;
-	genc_hash_t start_delta = (end_exc - start_exc) & mask;
+	genc_hash_t start_delta = (end_exc - start_inc) & mask;
 	
-	return idx_delta < start_delta;
+	return idx_delta <= start_delta;
 }
 
 /* Removes the item from the hash table.
@@ -245,9 +245,8 @@ void genc_lpht_remove(struct genc_linear_probing_hash_table* table, void* item)
 			genc_hash_t key_bucket_idx = genc_lpht_get_bucket_for_key(table, item_key);
 			if (idx_between(empty_idx, key_bucket_idx, idx, table->capacity))
 			{
-				char* moving_item = buckets + key_bucket_idx * bucket_size;
-				memcpy(empty_bucket, moving_item, bucket_size);
-				item_clear_fn(moving_item, opaque);
+				memcpy(empty_bucket, bucket, bucket_size);
+				item_clear_fn(bucket, opaque);
 				empty_idx = idx;
 				empty_bucket = bucket;
 			}
@@ -259,7 +258,6 @@ void genc_lpht_remove(struct genc_linear_probing_hash_table* table, void* item)
 
 		// shrink if necessary
 		unsigned new_load = 0;
-		--table->item_count;
 		new_load = (unsigned)(100ull * (table->item_count) / table->capacity);
 
 		if (new_load > 0 && new_load < table->load_percent_shrink_threshold)

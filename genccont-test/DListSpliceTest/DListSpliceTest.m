@@ -216,5 +216,63 @@ static genc_dlist_head_t list1, list2;
 
 }
 
+- (void)testSpliceBefore
+{
+	 /* We have these 2 lists:
+	* 1: -> H1 <-> A <-> B <-> C <-
+	* 2: -> H2 <-> D <-> E <-> F <-> G <-
+	*
+	* genc_dlist_splice(H1, H2, H2)
+	* 1: -> H1 <-> A <-> B <-> C <-> D <-> E <-> F <-> G <-
+	* 2: -> H2 <-
+	*/
+		
+	genc_dlist_splice_before(&list1, &list2, &list2);
+	
+	genc_dlist_head_t* cur = list1.next;
+	STAssertTrue(cur != &list1, @"List is not empty");
+	char_list_item* cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'A', @"Expect item A");
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'B', @"Expect item B");
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'C', @"Expect item C");
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'D', @"Expect item D");	
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'E', @"Expect item E");
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'F', @"Expect item F");
+	
+	cur = cur->next;
+	STAssertTrue(cur != &list1, @"Shouldn't be at end of list");
+	cur_char = genc_container_of(cur, char_list_item, head);
+	STAssertEquals(cur_char->c, (char)'G', @"Expect item G");
+	
+	cur = cur->next;
+	STAssertEquals(cur, &list1, @"Expect end of list");
+	
+	genc_dlist_head_t* cur2 = list2.next;
+	cur2 = cur2->next;
+	STAssertEquals(cur2, &list2, @"Expect end of list");
+
+}
+
+
 
 @end

@@ -420,5 +420,41 @@ static void* realloc_fn(void* old_ptr, size_t old_size, size_t new_size, void* o
 	STAssertEquals(test3.key.i, find->key.i, @"Find key must not change");
 }
 
+- (void)testIterating
+{
+	test_value test = { .key = { 0 }, .a = 107, .b = 214 };
+	test_value test2 = { .key = { 1 }, .a = 101, .b = 201 };
+	test_value test3 = { .key = { 2 }, .a = 104, .b = 229 };
+	test_value test4 = { .key = { 3 }, .a = 114, .b = 239 };
+	test_value test5 = { .key = { 4 }, .a = 124, .b = 249 };
+
+	genc_lpht_insert_item(&hashtable, &test);
+	genc_lpht_insert_item(&hashtable, &test2);
+	genc_lpht_insert_item(&hashtable, &test3);
+	genc_lpht_insert_item(&hashtable, &test4);
+	genc_lpht_insert_item(&hashtable, &test5);
+	
+	BOOL array[5] = {FALSE, FALSE, FALSE, FALSE, FALSE};
+	test_value* item = genc_lpht_first_item(&hashtable);
+	int count = 0;
+	
+	do
+	{
+		uint32_t key = item->key.i;
+		array[key] = TRUE;
+		count++;
+	}
+	while ((item = genc_lpht_next_item(&hashtable, item)));
+	
+	STAssertEquals(5, count, @"5 items were looped through");
+	STAssertTrue(array[0], @"All the items in the array were seen");
+	STAssertTrue(array[1], @"All the items in the array were seen");
+	STAssertTrue(array[2], @"All the items in the array were seen");
+	STAssertTrue(array[3], @"All the items in the array were seen");
+	STAssertTrue(array[4], @"All the items in the array were seen");
+
+
+}
+
 
 @end

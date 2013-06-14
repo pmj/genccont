@@ -113,6 +113,8 @@ genc_hash_t genc_lpht_get_bucket_for_key(
 
 /* Removes the item from the hash table.
  * Deallocation, like allocation, is the responsibility of the caller.
+ * item must point to the location of the value within the table - i.e.
+ * returned by genc_lpht_find or genc_lpht_insert_item
  */
 void genc_lpht_remove(struct genc_linear_probing_hash_table* table, void* item);
 

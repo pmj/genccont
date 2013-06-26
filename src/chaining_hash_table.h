@@ -51,6 +51,9 @@ freely, subject to the following restrictions:
 extern "C" {
 #endif
 
+// Chaining hash table uses slist for chaining
+typedef genc_slist_head_t genc_cht_head_t;
+
 /* key hashing function to be implemented by the client; will be passed pointer
  * to the key extracted from an item or passed to the library directly */
 typedef genc_key_hash_fn genc_chaining_key_hash_fn;

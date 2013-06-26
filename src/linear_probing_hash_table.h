@@ -151,6 +151,18 @@ struct genc_linear_probing_hash_table
 };
 typedef struct genc_linear_probing_hash_table genc_linear_probing_hash_table_t;
 
+#define genc_lpht_first_obj(table, type) \
+GENC_CXX_CAST(type*, genc_lpht_first_item(table))
+
+#define genc_lpht_next_obj(table, cur_obj, type) \
+GENC_CXX_CAST(type*, genc_lpht_next_item(table, GENC_CXX_CAST(type*, cur_obj)))
+
+#define genc_lpht_find_obj(table, key, type) \
+GENC_CXX_CAST(type*, genc_lpht_find(table, key))
+
+#define genc_lpht_insert_obj(table, new_obj, type) \
+GENC_CXX_CAST(type*, genc_lpht_insert_item(table, GENC_CXX_CAST(type*, new_obj)))
+
 
 #if defined(KERNEL) && defined(APPLE)
 #undef ptrdiff_t

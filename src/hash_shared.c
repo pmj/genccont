@@ -79,3 +79,12 @@ genc_bool_t genc_uint32_keys_equal(void* id1, void* id2, void* opaque_unused GEN
 	return *(uint32_t*)id1 == *(uint32_t*)id2;
 }
 
+size_t genc_pointer_key_hash(void* key, void* opaque_unused)
+{
+	return genc_hash_size((uintptr_t)key);
+}
+genc_bool_t genc_pointer_keys_equal(void* key1, void* key2, void* opaque_unused)
+{
+	return key1 == key2;
+}
+

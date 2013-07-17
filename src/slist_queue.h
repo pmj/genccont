@@ -42,6 +42,7 @@ struct slist_queue
 	struct slist_head** tail;
 };
 typedef struct slist_queue slist_queue_t;
+typedef struct slist_queue genc_slist_queue_t;
 
 /** Initialises an empty queue */
 void genc_slq_init(struct slist_queue* queue);

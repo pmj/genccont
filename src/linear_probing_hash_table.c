@@ -21,6 +21,14 @@ genc_bool_t genc_linear_probing_hash_table_init(
 		opaque, bucket_size, initial_capacity_pow2, 70, 0);
 }
 
+static void clear_buckets(void* buckets, const size_t capacity, const size_t bucket_size, genc_item_clear_fn item_clear_fn, void* opaque);
+
+void genc_lpht_clear(genc_linear_probing_hash_table_t* table)
+{
+	clear_buckets(table->buckets, table->capacity, table->bucket_size, table->item_clear_fn, table->opaque);
+	table->item_count = 0;
+}
+
 static void* alloc_empty_buckets(
 	genc_realloc_fn realloc_fn, genc_item_clear_fn item_clear_fn,
 	size_t capacity, size_t bucket_size, void* opaque)
@@ -28,15 +36,19 @@ static void* alloc_empty_buckets(
 	void* buckets = realloc_fn(NULL, 0, capacity * bucket_size, opaque);
 	if (!buckets)
 		return NULL;
-	
-	// set all buckets to empty
+
+	clear_buckets(buckets, capacity, bucket_size, item_clear_fn, opaque);
+	return buckets;
+}
+
+static void clear_buckets(void* buckets, const size_t capacity, const size_t bucket_size, genc_item_clear_fn item_clear_fn, void* opaque)
+{	// set all buckets to empty
 	char* bucket = GENC_CXX_CAST(char*, buckets);
 	for (size_t i = 0; i < capacity; ++i)
 	{
 		item_clear_fn(bucket, opaque);
 		bucket += bucket_size;
 	}
-	return buckets;
 }
 
 /* initialises the hash table with non-default thresholds.

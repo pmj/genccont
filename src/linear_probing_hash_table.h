@@ -133,6 +133,11 @@ void* genc_lpht_first_item(struct genc_linear_probing_hash_table* table);
 /* Next non-empty bucket */
 void* genc_lpht_next_item(struct genc_linear_probing_hash_table* table, void* cur_item);
 
+/* Empty all buckets in the table and reset the item count back to 0, but do not
+ * free/alloc any memory. */
+void genc_lpht_clear(struct genc_linear_probing_hash_table* table);
+
+
 struct genc_linear_probing_hash_table
 {
 	genc_key_hash_fn hash_fn;

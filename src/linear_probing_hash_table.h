@@ -104,6 +104,32 @@ void genc_lpht_destroy(struct genc_linear_probing_hash_table* table);
 void* genc_lpht_insert_item(
 	struct genc_linear_probing_hash_table* table, void* item);
 
+enum genc_lpht_insertion_test_result_type
+{
+	// inserting a NULL item is a no-op
+	GENC_LPHT_INSERT_NULL,
+	// inserting is straightforward: pick a bucket, write to it
+	GENC_LPHT_INSERT_SIMPLE,
+	// inserting would trigger a resize (realloc array to resize_bytes) but would succeed even if resizing fails
+	GENC_LPHT_INSERT_WANTS_RESIZE,
+	// inserting would trigger a resize and if the realloc fails, so will the insertion
+	GENC_LPHT_INSERT_NEEDS_RESIZE,
+	// The table is full, but resizing would trigger an overflow.
+	GENC_LPHT_INSERT_SIZE_OVERFLOW,
+	// An item with the same key is already present in the table, so the insertion would fail
+	GENC_LPHT_INSERT_KEY_EXISTS
+};
+struct genc_lpht_insertion_test_result
+{
+	enum genc_lpht_insertion_test_result_type type;
+	size_t resize_bytes;
+};
+typedef struct genc_lpht_insertion_test_result genc_lpht_insertion_test_result_t;
+/* "What-if" function: if we were to insert item, what would happen? */
+genc_lpht_insertion_test_result_t genc_lpht_can_insert_item(
+	struct genc_linear_probing_hash_table* table, void* item);
+
+
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */
 void* genc_lpht_find(struct genc_linear_probing_hash_table* table, void* key);
 

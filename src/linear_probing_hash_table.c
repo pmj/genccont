@@ -197,6 +197,49 @@ void* genc_lpht_insert_item(
 	return inserted;
 }
 
+genc_lpht_insertion_test_result_t genc_lpht_can_insert_item(
+	struct genc_linear_probing_hash_table* table, void* item)
+{
+	genc_lpht_insertion_test_result_t res = { GENC_LPHT_INSERT_NULL, 0};
+	unsigned new_load;
+	if (!item) return res;
+
+	new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
+	if (new_load > table->load_percent_grow_threshold || new_load >= 100)
+	{
+		int factor_log2 = genc_log2_size(new_load / table->load_percent_grow_threshold);
+		if (new_load > ((unsigned)table->load_percent_grow_threshold) << factor_log2)
+			++factor_log2;
+		
+		size_t const old_capacity = table->capacity;
+		size_t new_capacity = table->capacity << factor_log2;
+		while (new_capacity < table->capacity)
+		{
+			/* integer overflow */
+			--factor_log2;
+			new_capacity = old_capacity << factor_log2;
+		}
+		if (new_capacity <= old_capacity)
+		{
+			if (table->item_count >= table->capacity)
+				res.type = GENC_LPHT_INSERT_SIZE_OVERFLOW;
+			else
+				res.type = GENC_LPHT_INSERT_SIMPLE;
+		}
+		else
+		{
+			res.resize_bytes = new_capacity * table->bucket_size;
+			res.type =
+				(table->item_count >= table->capacity)
+				? GENC_LPHT_INSERT_NEEDS_RESIZE : GENC_LPHT_INSERT_WANTS_RESIZE;
+		}
+		return res;
+	}
+	res.type = GENC_LPHT_INSERT_SIMPLE;
+	return res;
+}
+
+
 /* Looks up the key in the table, returning the matching item if present, or NULL otherwise. */
 void* genc_lpht_find(struct genc_linear_probing_hash_table* table, void* key)
 {

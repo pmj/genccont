@@ -3,3 +3,4 @@ cht_test
 *.dSYM
 .DS_Store
 xcuserdata
+*.xccheckout

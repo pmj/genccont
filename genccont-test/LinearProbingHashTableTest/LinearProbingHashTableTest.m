@@ -152,7 +152,7 @@ static void* realloc_fn(void* old_ptr, size_t old_size, size_t new_size, void* o
 	genc_lpht_insert_item(&hashtable, &test2);
 	test_key key = {14};
 	
-	test_value* bucket0 = hashtable.buckets;
+	test_value* bucket0 = hashtable.table.buckets;
 	test_value* bucket = genc_lpht_find(&hashtable, &key);
 	size_t bucket_num = bucket - bucket0;
 	
@@ -180,7 +180,7 @@ static void* realloc_fn(void* old_ptr, size_t old_size, size_t new_size, void* o
 	genc_lpht_insert_item(&hashtable, &test2);
 	test_key key = {15};
 	
-	test_value* bucket0 = hashtable.buckets;
+	test_value* bucket0 = hashtable.table.buckets;
 	test_value* bucket = genc_lpht_find(&hashtable, &key);
 	size_t bucket_num = bucket - bucket0;
 	
@@ -212,7 +212,7 @@ static void* realloc_fn(void* old_ptr, size_t old_size, size_t new_size, void* o
 	genc_lpht_insert_item(&hashtable, &test4);
 	test_key key = {15};
 	
-	test_value* bucket0 = hashtable.buckets;
+	test_value* bucket0 = hashtable.table.buckets;
 	test_value* bucket = genc_lpht_find(&hashtable, &key);
 	size_t bucket_num = bucket - bucket0;
 	

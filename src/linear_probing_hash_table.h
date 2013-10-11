@@ -163,8 +163,17 @@ void* genc_lpht_next_item(struct genc_linear_probing_hash_table* table, void* cu
  * free/alloc any memory. */
 void genc_lpht_clear(struct genc_linear_probing_hash_table* table);
 
+struct genc_linear_probing_hash_table_light
+{
+	/* Total number of buckets */
+	size_t capacity;
+	/* Number of filled buckets */
+	size_t item_count;
+	void* buckets;
+};
+typedef struct genc_linear_probing_hash_table_light genc_linear_probing_hash_table_light_t;
 
-struct genc_linear_probing_hash_table
+struct genc_linear_probing_hash_table_desc
 {
 	genc_key_hash_fn hash_fn;
 	genc_hash_get_item_key_fn get_key_fn;
@@ -172,13 +181,18 @@ struct genc_linear_probing_hash_table
 	genc_item_is_empty_fn item_empty_fn;
 	genc_item_clear_fn item_clear_fn;
 	genc_realloc_fn realloc_fn;
-	void* opaque;
 	size_t bucket_size; /* bytes per item */
-	size_t capacity;
-	size_t item_count;
-	void* buckets;
 	uint8_t load_percent_grow_threshold;
 	uint8_t load_percent_shrink_threshold;
+};
+typedef struct genc_linear_probing_hash_table_desc genc_linear_probing_hash_table_desc_t;
+
+
+struct genc_linear_probing_hash_table
+{
+	genc_linear_probing_hash_table_light_t table;
+	void* opaque;
+	genc_linear_probing_hash_table_desc_t desc;
 };
 typedef struct genc_linear_probing_hash_table genc_linear_probing_hash_table_t;
 
@@ -194,6 +208,79 @@ GENC_CXX_CAST(type*, genc_lpht_find(table, key))
 #define genc_lpht_insert_obj(table, new_obj, type) \
 GENC_CXX_CAST(type*, genc_lpht_insert_item(table, GENC_CXX_CAST(type*, new_obj)))
 
+
+
+void genc_linear_probing_hash_table_desc_init(
+	genc_linear_probing_hash_table_desc_t* desc,
+	genc_key_hash_fn hash_fn,
+	genc_hash_get_item_key_fn get_key_fn,
+	genc_hash_key_equality_fn key_equality_fn,
+	genc_item_is_empty_fn item_empty_fn,
+	genc_item_clear_fn item_clear_fn,
+	genc_realloc_fn realloc_fn,
+	size_t bucket_size, /* bytes per item */
+	uint8_t load_percent_grow_threshold,
+	uint8_t load_percent_shrink_threshold);
+
+genc_bool_t genc_linear_probing_hash_table_light_init(
+	genc_linear_probing_hash_table_light_t* table,
+	const genc_linear_probing_hash_table_desc_t* desc,
+	void* opaque,
+	size_t initial_capacity_pow2);
+
+/* Returns the current number of items in the hash table. */
+size_t genc_lphtl_count(genc_linear_probing_hash_table_light_t* table);
+
+/* Returns the number of buckets allocated. */
+size_t genc_lphtl_capacity(genc_linear_probing_hash_table_light_t* table);
+
+/* Drops all items from the table and deallocates bucket array memory. */
+void genc_lphtl_destroy(genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque);
+/* Drops all items from the table but does not resize or deallocate it. */
+void genc_lphtl_clear(genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque);
+
+/* Inserts the given item into the hash table.
+ * Returns NULL to report failure due to a duplicate or growth failure, pointer
+ * to inserted bucket on success. */
+void* genc_lphtl_insert_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item);
+
+void genc_lphtl_grow_by(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	unsigned log2_grow_factor);
+void genc_lphtl_shrink_by(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	unsigned log2_shrink_factor);
+
+genc_hash_t genc_lphtl_get_bucket_for_key(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* key);
+void* genc_lphtl_find(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* key);
+genc_lpht_insertion_test_result_t genc_lphtl_can_insert_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item);
+void genc_lphtl_remove(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item);
+void* genc_lphtl_first_item(genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque);
+void* genc_lphtl_next_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* const opaque,
+	void* cur_item);
+
+#define genc_lphtl_first_obj(table, desc, opaque, type) \
+GENC_CXX_CAST(type*, genc_lphtl_first_item(table, desc, opaque))
+
+#define genc_lphtl_next_obj(table, desc, opaque, cur_obj, type) \
+GENC_CXX_CAST(type*, genc_lphtl_next_item(table, desc, opaque, GENC_CXX_CAST(type*, cur_obj)))
+
+#define genc_lphtl_find_obj(table, desc, opaque, key, type) \
+GENC_CXX_CAST(type*, genc_lphtl_find(table, desc, opaque, key))
+
+#define genc_lphtl_insert_obj(table, desc, opaque, new_obj, type) \
+GENC_CXX_CAST(type*, genc_lphtl_insert_item(table, desc, opaque, GENC_CXX_CAST(type*, new_obj)))
 
 #if defined(KERNEL) && defined(APPLE)
 #undef ptrdiff_t

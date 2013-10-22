@@ -227,10 +227,11 @@ void* genc_lphtl_insert_item(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	void* item)
 {
-	unsigned new_load;
+	unsigned new_load = 100;
 	if (!item) return 0;
 	
-	new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
+	if (table->capacity > 0)
+		new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
 	if (new_load > desc->load_percent_grow_threshold || new_load >= 100)
 	{
 		int factor_log2 = genc_log2_size(new_load / desc->load_percent_grow_threshold);
@@ -260,10 +261,11 @@ genc_lpht_insertion_test_result_t genc_lphtl_can_insert_item(
 	void* item)
 {
 	genc_lpht_insertion_test_result_t res = { GENC_LPHT_INSERT_NULL, 0};
-	unsigned new_load;
+	unsigned new_load = 100;
 	if (!item) return res;
 
-	new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
+	if (table->capacity > 0)
+		new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
 	if (new_load > desc->load_percent_grow_threshold || new_load >= 100)
 	{
 		int factor_log2 = genc_log2_size(new_load / desc->load_percent_grow_threshold);
@@ -390,7 +392,8 @@ void genc_lphtl_remove(
 
 		// shrink if necessary
 		unsigned new_load = 0;
-		new_load = (unsigned)(100ull * (table->item_count) / table->capacity);
+		if (table->capacity > 0)
+			new_load = (unsigned)(100ull * (table->item_count) / table->capacity);
 
 		if (new_load > 0 && new_load < desc->load_percent_shrink_threshold)
 		{

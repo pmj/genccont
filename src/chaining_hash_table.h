@@ -172,6 +172,17 @@ for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \
 	++BUCKET_VAR, CUR_HEAD_PTR_VAR = (TABLE)->buckets + BUCKET_VAR) \
 		genc_slist_for_each_head_ref(ENTRY_VAR, CUR_HEAD_PTR_VAR)
 
+/* Walk through each object in the hash table. Use like this:
+ * If the table contains objects of type 'A', with member 'head' as the cht_head, then:
+ * 
+ * genc_cht_head_t** ref;
+ * A* obj;
+ * size_t bucket;
+ * genc_cht_for_each_obj_ref(table_ptr, obj, ref, bucket, A, head)
+ * { 
+ *   // do stuff with obj or ref - including removal
+ * }
+ */
 #define genc_cht_for_each_obj_ref(TABLE, ENTRY_VAR, CUR_HEAD_PTR_VAR, BUCKET_VAR, ENTRY_TYPE, TABLE_HEAD_MEMBER_NAME) \
 for (BUCKET_VAR = 0, CUR_HEAD_PTR_VAR = ((TABLE)->buckets + BUCKET_VAR); \
 	BUCKET_VAR < (TABLE)->capacity; \

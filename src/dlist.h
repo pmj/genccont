@@ -186,7 +186,7 @@ genc_container_of( \
 for ( \
 	type* var = genc_container_of_notnull(((list_head)->next), type, member); \
 	&var->member != (list_head); \
-	v = genc_container_of_notnull(v->member.next, type, member))
+	var = genc_container_of_notnull(var->member.next, type, member))
 
 
 #ifdef __cplusplus

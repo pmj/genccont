@@ -246,7 +246,7 @@ void* genc_lphtl_insert_item(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	void* item);
 
-void genc_lphtl_grow_by(
+bool genc_lphtl_grow_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	unsigned log2_grow_factor);
 void genc_lphtl_shrink_by(
@@ -269,6 +269,14 @@ void* genc_lphtl_first_item(genc_linear_probing_hash_table_light_t* table, const
 void* genc_lphtl_next_item(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* const opaque,
 	void* cur_item);
+
+/** Resizes the table, if necessary, so that it will not need resizing to hold
+ * target_count items.
+ * So if it currently has count items, where count < target_count, and we make
+ * (target_count-count) successful insertions, none of those insertions will
+ * trigger a resize operation. */
+bool genc_lphtl_reserve_space(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque, size_t target_count);
 
 #define genc_lphtl_first_obj(table, desc, opaque, type) \
 GENC_CXX_CAST(type*, genc_lphtl_first_item(table, desc, opaque))

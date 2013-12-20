@@ -223,15 +223,13 @@ void* genc_lpht_insert_item(
 	return genc_lphtl_insert_item(&table->table, &table->desc, table->opaque, item);
 }
 
-void* genc_lphtl_insert_item(
-	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
-	void* item)
+bool genc_lphtl_reserve_space(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque, size_t target_count)
 {
 	unsigned new_load = 100;
-	if (!item) return 0;
 	
 	if (table->capacity > 0)
-		new_load = (unsigned)(100ul * (table->item_count + 1ul) / table->capacity);
+		new_load = (unsigned)(100ul * target_count / table->capacity);
 	if (new_load > desc->load_percent_grow_threshold || new_load >= 100)
 	{
 		int factor_log2 = genc_log2_size(new_load / desc->load_percent_grow_threshold);
@@ -239,8 +237,18 @@ void* genc_lphtl_insert_item(
 			++factor_log2;
 		
 		/*printf("New load factor %d%%, growth threshold reached. Growing by factor 1 << %d (%u).\n", new_load, factor_log2, 1u << factor_log2);*/
-		genc_lphtl_grow_by(table, desc, opaque, factor_log2);
+		return genc_lphtl_grow_by(table, desc, opaque, factor_log2);
 	}
+	return true;
+}
+
+void* genc_lphtl_insert_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item)
+{
+	if (!item) return NULL;
+	
+	genc_lphtl_reserve_space(table, desc, opaque, table->item_count + 1);
 	
 	void* inserted = genc_lphtl_insert_item_into_table(table, desc, opaque, item);
 	if (!inserted)
@@ -465,7 +473,7 @@ void genc_lpht_grow_by(
 {
 	genc_lphtl_grow_by(&table->table, &table->desc, table->opaque, log2_grow_factor);
 }
-void genc_lphtl_grow_by(
+bool genc_lphtl_grow_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* const opaque,
 	unsigned log2_grow_factor)
 {
@@ -484,14 +492,14 @@ void genc_lphtl_grow_by(
 		new_capacity = old_capacity << log2_grow_factor;
 	}
 	if (new_capacity <= old_capacity)
-		return;
+		return false;
 		
 	const size_t bucket_size = desc->bucket_size;
 
 	buckets = GENC_CXX_CAST(char*, desc->realloc_fn(
 		table->buckets, old_capacity * bucket_size, new_capacity * bucket_size, opaque));
 	if (!buckets)
-		return;
+		return false;
 	
 	// zero out the newly added buckets
 	const genc_item_clear_fn item_clear_fn = desc->item_clear_fn;
@@ -520,6 +528,7 @@ void genc_lphtl_grow_by(
 			item_clear_fn(bucket, opaque);
 		}
 	}
+	return true;
 }
 
 static genc_bool_t genc_lphtl_verify(

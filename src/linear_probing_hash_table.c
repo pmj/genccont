@@ -165,6 +165,12 @@ void genc_lphtl_destroy(genc_linear_probing_hash_table_light_t* table, const gen
 	}
 }
 
+void genc_lphtl_zero(genc_linear_probing_hash_table_light_t* table)
+{
+	table->buckets = NULL;
+	table->capacity = table->item_count = 0;
+}
+
 /* locates the bucket which either matches key or which we can insert an item
  * with that key into */
 static void* genc_lphtl_find_or_empty(

@@ -228,6 +228,10 @@ genc_bool_t genc_linear_probing_hash_table_light_init(
 	void* opaque,
 	size_t initial_capacity_pow2);
 
+/* Zeroes out all the fields in the table struct - this leaves the table in a
+ * known but unusable state. (Like init followed by destroy) */
+void genc_lphtl_zero(genc_linear_probing_hash_table_light_t* table);
+
 /* Returns the current number of items in the hash table. */
 size_t genc_lphtl_count(genc_linear_probing_hash_table_light_t* table);
 

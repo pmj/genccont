@@ -46,6 +46,8 @@ void genc_dlist_init(struct dlist_head* head);
 /* Sets the list membership head to all NULLs (not part of a list) */
 void genc_dlist_head_zero(struct dlist_head* head);
 
+/* Returns true if the list head is cleared to NULLs (not part of a list) */
+bool genc_dlist_is_null(genc_dlist_head_t* head);
 
 /* predicate function type for filtering list entries, returns 0 for no match, non-0 for match */
 typedef genc_bool_t(*genc_dlist_entry_pred_fn)(struct dlist_head* entry, void* data);
@@ -78,6 +80,11 @@ void genc_dlist_insert_after(struct dlist_head* new_entry, struct dlist_head* af
 /** Removes the list element at the given position and returns it
  */
 struct dlist_head* genc_dlist_remove(struct dlist_head* entry);
+
+/** If the item's links are non-NULL, the item is removed from the list, and
+ * true is returned. Otherwise, there is no list from which to remove it, so
+ * false is returned. */
+bool genc_dlist_remove_if_not_null(genc_dlist_head_t* item);
 
 /** Returns 0 if the list contains elements, non-zero (1) if empty 
  */

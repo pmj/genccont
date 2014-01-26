@@ -37,6 +37,13 @@ void genc_dlist_head_zero(struct dlist_head* head)
 	head->next = head->prev = NULL;
 }
 
+bool genc_dlist_is_null(genc_dlist_head_t* head)
+{
+	bool is_null = (head->next == NULL);
+	assert(is_null == (head->prev == NULL));
+	return is_null;
+}
+
 struct dlist_head* genc_dlist_find_in_range(struct dlist_head* start_after, struct dlist_head* end_before, genc_dlist_entry_pred_fn pred, void* data)
 {
 	struct dlist_head* cur = start_after->next;
@@ -76,9 +83,16 @@ struct dlist_head* genc_dlist_remove(struct dlist_head* at)
 {
 	at->prev->next = at->next;
 	at->next->prev = at->prev;
-	at->next = NULL;
-	at->prev = NULL;
+	genc_dlist_head_zero(at);
 	return at;
+}
+
+bool genc_dlist_remove_if_not_null(genc_dlist_head_t* item)
+{
+	if (genc_dlist_is_null(item))
+		return false;
+	genc_dlist_remove(item);
+	return true;
 }
 
 int genc_dlist_is_empty(struct dlist_head* list)

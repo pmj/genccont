@@ -205,3 +205,31 @@ void genc_dlist_splice_before(
 	genc_dlist_insert_range_before(range, into_before);
 }
 
+void genc_assert_dlist_is_healthy(genc_dlist_head_t* list)
+{
+	assert(list->next != NULL);
+	assert(list->prev != NULL);
+	genc_dlist_head_t* prev = list;
+	genc_dlist_head_t* cur = list->next;
+	genc_dlist_head_t* lagging = cur;
+	while (cur != list)
+	{
+		assert(cur->next != NULL);
+		assert(cur->prev != NULL);
+		assert(cur->prev == prev);
+		prev = cur;
+		cur = cur->next;
+		if (cur == list)
+			break;
+		
+		assert(cur != lagging);
+		assert(cur->next != NULL);
+		assert(cur->prev != NULL);
+		assert(cur->prev == prev);
+		prev = cur;
+		cur = cur->next;
+		lagging = lagging->next;
+		assert(cur != lagging);
+	}
+}
+

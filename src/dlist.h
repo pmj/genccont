@@ -141,6 +141,7 @@ void genc_dlist_splice(
 void genc_dlist_splice_before(
 	genc_dlist_head_t* into_before, genc_dlist_head_t* from_after, genc_dlist_head_t* from_before);
 
+void genc_assert_dlist_is_healthy(genc_dlist_head_t* list);
 
 /** genc_dlist_remove_object(entry, list_type, list_head_member_name)
  * Typed version of genc_dlist_remove_at(). */

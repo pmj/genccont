@@ -418,11 +418,11 @@ void genc_lphtl_remove(
 }
 
 /* Shrink the capacity of the table by a factor of 1 << log2_shrink_factor */
-void genc_lpht_shrink_by(struct genc_linear_probing_hash_table* table, unsigned log2_shrink_factor)
+bool genc_lpht_shrink_by(struct genc_linear_probing_hash_table* table, unsigned log2_shrink_factor)
 {
-	genc_lphtl_shrink_by(&table->table, &table->desc, table->opaque, log2_shrink_factor);
+	return genc_lphtl_shrink_by(&table->table, &table->desc, table->opaque, log2_shrink_factor);
 }
-void genc_lphtl_shrink_by(
+bool genc_lphtl_shrink_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void*const opaque,
 	unsigned log2_shrink_factor)
 {
@@ -431,7 +431,7 @@ void genc_lphtl_shrink_by(
 	while (table->item_count > (old_capacity >> log2_shrink_factor))
 	{
 		if (log2_shrink_factor < 1)
-			return;
+			return false;
 		--log2_shrink_factor;
 	}
 	
@@ -445,7 +445,7 @@ void genc_lphtl_shrink_by(
 	char* new_buckets = GENC_CXX_CAST(
 		char*, alloc_empty_buckets(realloc_fn, desc->item_clear_fn, new_capacity, bucket_size, opaque));
 	if (!new_buckets)
-		return;
+		return false;
 	
 	// re-insert items into new buckets
 	char* old_buckets = GENC_CXX_CAST(char*, table->buckets);
@@ -464,20 +464,20 @@ void genc_lphtl_shrink_by(
 			table->capacity = old_capacity;
 			realloc_fn(
 				new_buckets, new_capacity * bucket_size, 0, opaque);
-			return;
+			return false;
 		}
 	}
 	
 	realloc_fn(
 		old_buckets, old_capacity * bucket_size, 0, opaque);
-	return;
+	return true;
 }
 
 /* Grow the capacity of the table by a factor of 1 << log2_grow_factor */
-void genc_lpht_grow_by(
+bool genc_lpht_grow_by(
 	struct genc_linear_probing_hash_table* table, unsigned log2_grow_factor)
 {
-	genc_lphtl_grow_by(&table->table, &table->desc, table->opaque, log2_grow_factor);
+	return genc_lphtl_grow_by(&table->table, &table->desc, table->opaque, log2_grow_factor);
 }
 bool genc_lphtl_grow_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* const opaque,
@@ -535,6 +535,18 @@ bool genc_lphtl_grow_by(
 		}
 	}
 	return true;
+}
+
+bool genc_lpht_resize(struct genc_linear_probing_hash_table* table, size_t new_capacity)
+{
+	if (new_capacity < table->table.item_count)
+		return false;
+	else if (new_capacity < table->table.capacity)
+		return genc_lpht_shrink_by(table, genc_log2_size(table->table.capacity / new_capacity));
+	else if (new_capacity > table->table.capacity)
+		return genc_lpht_grow_by(table, genc_log2_size(new_capacity / table->table.capacity));
+	else
+		return true; // nothing to do (new capacity = old)
 }
 
 static genc_bool_t genc_lphtl_verify(

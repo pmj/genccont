@@ -145,9 +145,11 @@ genc_hash_t genc_lpht_get_bucket_for_key(
 void genc_lpht_remove(struct genc_linear_probing_hash_table* table, void* item);
 
 /* Shrink the capacity of the table by a factor of 1 << log2_shrink_factor */
-void genc_lpht_shrink_by(struct genc_linear_probing_hash_table* table, unsigned log2_shrink_factor);
+bool genc_lpht_shrink_by(struct genc_linear_probing_hash_table* table, unsigned log2_shrink_factor);
 /* Grow the capacity of the table by a factor of 1 << log2_grow_factor */
-void genc_lpht_grow_by(struct genc_linear_probing_hash_table* table, unsigned log2_grow_factor);
+bool genc_lpht_grow_by(struct genc_linear_probing_hash_table* table, unsigned log2_grow_factor);
+
+bool genc_lpht_resize(struct genc_linear_probing_hash_table* table, size_t new_capacity);
 
 /* Walks all the elements in the hash table and checks they're still in the correct bucket. */
 genc_bool_t genc_lpht_verify(struct genc_linear_probing_hash_table* table);
@@ -253,7 +255,7 @@ void* genc_lphtl_insert_item(
 bool genc_lphtl_grow_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	unsigned log2_grow_factor);
-void genc_lphtl_shrink_by(
+bool genc_lphtl_shrink_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	unsigned log2_shrink_factor);
 

@@ -22,6 +22,9 @@ freely, subject to the following restrictions:
 */
 
 #include "slist_queue.h"
+#if !defined(KERNEL) && !defined(__KERNEL__)
+#include <assert.h>
+#endif
 
 void genc_slq_init(struct slist_queue* queue)
 {
@@ -53,13 +56,19 @@ void genc_slq_push_front(struct slist_queue* queue, struct slist_head* new_item)
 /** Pops an item off the front of the queue, returning it. */
 struct slist_head* genc_slq_pop_front(struct slist_queue* queue)
 {
-	struct slist_head* removed = genc_slist_remove_at(&queue->head);
+	return genc_slq_remove_item_at(queue, &queue->head);
+}
+
+struct slist_head* genc_slq_remove_item_at(struct slist_queue* queue, struct slist_head** ref)
+{
+	struct slist_head* removed = genc_slist_remove_at(ref);
 	if (!removed) return NULL;
-	if (!queue->head)
+	if (!*ref)
 	{
 		/* queue is now empty */
-		queue->tail = &queue->head;
+		queue->tail = ref;
 	}
+	assert(queue->tail != &removed->next);
 	return removed;
 }
 

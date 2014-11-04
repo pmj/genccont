@@ -75,6 +75,10 @@ size_t genc_slq_length(slist_queue_t* queue);
  * leaving from_queue empty. */
 void genc_slq_splice_onto_end(slist_queue_t* onto_end_of_queue, slist_queue_t* from_queue);
 
+/** Removes an arbitrary element from within the list and returns it. If the
+ * item was the last one, the tail pointer is updated correctly. */
+struct slist_head* genc_slq_remove_item_at(struct slist_queue* queue, struct slist_head** at);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

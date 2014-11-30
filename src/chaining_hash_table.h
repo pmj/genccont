@@ -140,6 +140,9 @@ void genc_cht_grow_by(struct genc_chaining_hash_table* table, unsigned log2_grow
 /* Walks all the elements in the hash table and checks they're still in the correct bucket. */
 void genc_cht_verify(struct genc_chaining_hash_table* table);
 
+genc_cht_head_t* genc_cht_next_item(struct genc_chaining_hash_table* table, genc_cht_head_t* after_item);
+genc_cht_head_t* genc_cht_first_item(struct genc_chaining_hash_table* table);
+
 struct genc_chaining_hash_table
 {
 	genc_chaining_key_hash_fn hash_fn;
@@ -159,6 +162,12 @@ typedef struct genc_chaining_hash_table genc_chaining_hash_table_t;
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#define genc_cht_next_obj(table, after_item, type, header_name) \
+genc_container_of(genc_cht_next_item((table), &(after_item)->header_name), type, header_name)
+
+#define genc_cht_first_obj(table, type, header_name) \
+genc_container_of(genc_cht_first_item(table), type, header_name)
 
 #define genc_cht_find_obj(table, key, type, header_name) \
 genc_container_of(genc_cht_find((table), (key)), type, header_name)

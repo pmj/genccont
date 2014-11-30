@@ -186,17 +186,26 @@ struct slist_head* genc_cht_find(struct genc_chaining_hash_table* table, void* k
 	return *genc_cht_find_ref(table, key);
 }
 
-struct slist_head** genc_cht_get_bucket_ref_for_key(struct genc_chaining_hash_table* table, void* key)
+static size_t genc_cht_get_bucket_index_for_key(struct genc_chaining_hash_table* table, void* key)
 {
 	void* op = table->opaque;
 	genc_hash_t hash = 0;
-	size_t idx;
 	
 	hash = table->hash_fn(key, op);
-	idx = hash & (table->capacity - 1ul);
+	return hash & (table->capacity - 1ul);
+}
+
+struct slist_head** genc_cht_get_bucket_ref_for_key(struct genc_chaining_hash_table* table, void* key)
+{
+	size_t idx = genc_cht_get_bucket_index_for_key(table, key);
 	return table->buckets + idx;
 }
 
+static size_t genc_cht_get_bucket_index_for_item(struct genc_chaining_hash_table* table, genc_cht_head_t* item)
+{
+	void* key = table->get_key_fn(item, table->opaque);
+	return genc_cht_get_bucket_index_for_key(table, key);
+}
 
 /* Looks up the key in the table, returning the reference pointing to the
  * matching item, or NULL if not found. The reference may be passed to
@@ -357,3 +366,30 @@ genc_bool_t genc_cht_remove_item(struct genc_chaining_hash_table* table, genc_sl
 	return false;
 }
 
+
+genc_cht_head_t* genc_cht_next_item(struct genc_chaining_hash_table* table, genc_cht_head_t* after_item)
+{
+	if (!after_item)
+		return genc_cht_first_item(table);
+	if(after_item->next)
+		return after_item->next;
+	size_t idx = genc_cht_get_bucket_index_for_item(table, after_item);
+	do
+	{
+		++idx;
+		if (idx >= table->capacity)
+			return NULL;
+	} while (table->buckets[idx] == NULL);
+	return table->buckets[idx];
+}
+
+genc_cht_head_t* genc_cht_first_item(struct genc_chaining_hash_table* table)
+{
+	genc_cht_head_t** const buckets = table->buckets;
+	for (size_t idx = 0; idx < table->capacity; ++idx)
+	{
+		if (buckets[idx])
+			return buckets[idx];
+	}
+	return NULL;
+}

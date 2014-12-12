@@ -213,6 +213,8 @@ GENC_CXX_CAST(type*, genc_lpht_find(table, key))
 GENC_CXX_CAST(type*, genc_lpht_insert_item(table, GENC_CXX_CAST(type*, new_obj)))
 
 
+#define genc_lpht_for_each_obj(type, obj_var, table) \
+for (type* obj_var = genc_lpht_first_obj(table, type); obj_var != NULL; obj_var = genc_lpht_next_obj(table, obj_var, type))
 
 void genc_linear_probing_hash_table_desc_init(
 	genc_linear_probing_hash_table_desc_t* desc,

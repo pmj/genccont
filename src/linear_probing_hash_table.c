@@ -220,6 +220,21 @@ static void* genc_lphtl_insert_item_into_table(
 	return bucket;
 }
 
+// pure insertion/replacement, without the bookkeeping
+static void* genc_lphtl_insert_or_replace_item_in_table(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque, void* item, genc_bool_t* out_replaced_existing)
+{
+	void* item_key = desc->get_key_fn(item, opaque);
+	void* bucket = genc_lphtl_find_or_empty(table, desc, opaque, item_key, out_replaced_existing);
+	
+	if (!bucket)
+		return NULL; // table is full
+	
+	// insert/replace the item
+	memcpy(bucket, item, desc->bucket_size);
+	return bucket;
+}
+
 /* Inserts the given item into the hash table.
  * Returns NULL to report failure due to a duplicate or growth failure, pointer
  * to inserted bucket on success. */
@@ -227,6 +242,12 @@ void* genc_lpht_insert_item(
 	struct genc_linear_probing_hash_table* table, void* item)
 {
 	return genc_lphtl_insert_item(&table->table, &table->desc, table->opaque, item);
+}
+
+void* genc_lpht_insert_or_update_item(
+	struct genc_linear_probing_hash_table* table, void* item)
+{
+	return genc_lphtl_insert_or_update_item(&table->table, &table->desc, table->opaque, item);
 }
 
 bool genc_lphtl_reserve_space(
@@ -261,6 +282,24 @@ void* genc_lphtl_insert_item(
 		return NULL;
 	
 	++table->item_count;
+	return inserted;
+}
+
+void* genc_lphtl_insert_or_update_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item)
+{
+	if (!item) return NULL;
+	
+	genc_lphtl_reserve_space(table, desc, opaque, table->item_count + 1);
+	
+	bool updated_existing = false;
+	void* inserted = genc_lphtl_insert_or_replace_item_in_table(table, desc, opaque, item, &updated_existing);
+	if (!inserted)
+		return NULL;
+	
+	if (!updated_existing)
+		++table->item_count;
 	return inserted;
 }
 

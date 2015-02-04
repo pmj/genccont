@@ -103,6 +103,8 @@ void genc_lpht_destroy(struct genc_linear_probing_hash_table* table);
  * to inserted bucket on success. */
 void* genc_lpht_insert_item(
 	struct genc_linear_probing_hash_table* table, void* item);
+void* genc_lpht_insert_or_update_item(
+	struct genc_linear_probing_hash_table* table, void* item);
 
 enum genc_lpht_insertion_test_result_type
 {
@@ -251,6 +253,9 @@ void genc_lphtl_clear(genc_linear_probing_hash_table_light_t* table, const genc_
 void* genc_lphtl_insert_item(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
 	void* item);
+void* genc_lphtl_insert_or_update_item(
+	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
+	void* item);
 
 bool genc_lphtl_grow_by(
 	genc_linear_probing_hash_table_light_t* table, const genc_linear_probing_hash_table_desc_t* desc, void* opaque,
@@ -303,6 +308,26 @@ GENC_CXX_CAST(type*, genc_lphtl_insert_item(table, desc, opaque, GENC_CXX_CAST(t
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+
+// For struct items with single-field, primitive type keys, this can generate the necessary accessor functions for you
+#define GENC_LPHT_DEFINE_BASIC_STRUCT_ITEM_FNS(STRUCT_NAME, KEY_FIELD, EMPTY_KEY_VAL, FN_LINKAGE) \
+FN_LINKAGE void* STRUCT_NAME ## _get_key(void* item, void* opaque) \
+{ \
+	struct STRUCT_NAME* s = item; \
+	return &s->KEY_FIELD; \
+} \
+FN_LINKAGE genc_bool_t STRUCT_NAME ## _is_empty(void* item, void* opaque) \
+{ \
+	struct STRUCT_NAME* s = item; \
+	return s->KEY_FIELD == EMPTY_KEY_VAL; \
+} \
+FN_LINKAGE void STRUCT_NAME ## _clear(void* item, void* opaque) \
+{ \
+	struct STRUCT_NAME* s = item; \
+	memset(s, 0, sizeof(*s)); \
+	s->KEY_FIELD = EMPTY_KEY_VAL; \
+}
 
 
 #endif

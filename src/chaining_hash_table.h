@@ -142,6 +142,16 @@ void genc_cht_verify(struct genc_chaining_hash_table* table);
 
 genc_cht_head_t* genc_cht_next_item(struct genc_chaining_hash_table* table, genc_cht_head_t* after_item);
 genc_cht_head_t* genc_cht_first_item(struct genc_chaining_hash_table* table);
+struct genc_cht_location
+{
+	size_t bucket;
+	genc_cht_head_t* item;
+};
+typedef struct genc_cht_location genc_cht_location_t;
+// Iteration function - only valid if table is not modified
+/* Begin iteration at location { .bucket = 0, item = NULL } - will return first item.
+ * Pass in item as previous to obtain following one. End of table is indicated by returned NULL item and bucket = capacity. */
+genc_cht_location_t genc_cht_next_item_with_bucket(struct genc_chaining_hash_table* table, genc_cht_location_t prev);
 
 struct genc_chaining_hash_table
 {

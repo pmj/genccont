@@ -393,3 +393,30 @@ genc_cht_head_t* genc_cht_first_item(struct genc_chaining_hash_table* table)
 	}
 	return NULL;
 }
+
+genc_cht_location_t genc_cht_next_item_with_bucket(struct genc_chaining_hash_table* table, genc_cht_location_t prev)
+{
+	genc_cht_location_t location = prev;
+	if (location.item != NULL)
+	{
+		genc_cht_head_t* next = prev.item->next;
+		if (next != NULL)
+		{
+			location.item = next;
+			return location;
+		}
+		location.item = NULL;
+		location.bucket++;
+	}
+	while (location.bucket < table->capacity)
+	{
+		genc_cht_head_t* next = table->buckets[location.bucket];
+		if (next != NULL)
+		{
+			location.item = next;
+			return location;
+		}
+		location.bucket++;
+	}
+	return location;
+}

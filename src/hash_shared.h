@@ -129,6 +129,21 @@ static GENC_INLINE int genc_log2_size_roundup(size_t val)
 	return log2 + 1;
 }
 
+/// Helper macro for generating key getter functions (genc_hash_get_item_key_fn) for simple structs
+#define GENC_CHT_STRUCT_KEY_GETTER(STRUCTNAME, CHT_HEAD_MEMBER, KEY_MEMBER) \
+static void* STRUCTNAME ## _get_key(struct slist_head* item, void* opaque) \
+{ \
+	return &genc_container_of_notnull(item, struct STRUCTNAME, CHT_HEAD_MEMBER)->KEY_MEMBER; \
+}
+
+/// Helper macro for generating key getter functions (genc_hash_get_item_key_fn) for pointer fields in structs
+/** The generated getter returns the field's pointer value itself, not the pointer to the field. */
+#define GENC_CHT_STRUCT_POINTER_KEY_GETTER(STRUCTNAME, CHT_HEAD_MEMBER, KEY_MEMBER) \
+static void* STRUCTNAME ## _get_key(struct slist_head* item, void* opaque) \
+{ \
+	return genc_container_of_notnull(item, struct STRUCTNAME, CHT_HEAD_MEMBER)->KEY_MEMBER; \
+}
+
 
 #ifdef __cplusplus
 } /* extern "C" */

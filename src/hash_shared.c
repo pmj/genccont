@@ -88,3 +88,8 @@ genc_bool_t genc_pointer_keys_equal(void* key1, void* key2, void* opaque_unused)
 	return key1 == key2;
 }
 
+size_t genc_hash_combine(size_t seed, size_t hash_value)
+{
+	seed ^= hash_value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	return seed;
+}

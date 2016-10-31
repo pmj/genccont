@@ -108,6 +108,7 @@ genc_bool_t genc_uint64_keys_equal(void* id1, void* id2, void* opaque_unused);
 size_t genc_pointer_key_hash(void* key, void* opaque_unused);
 genc_bool_t genc_pointer_keys_equal(void* key1, void* key2, void* opaque_unused);
 
+size_t genc_hash_combine(size_t seed, size_t hash_value);
 
 /* Helpers for sizing power-of-2-capacity hash tables: */
 

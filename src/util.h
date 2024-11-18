@@ -28,13 +28,17 @@
 #ifndef GENCCONT_UTIL_H
 #define GENCCONT_UTIL_H
 
+#ifdef __APPLE__
+#include <Availability.h>
+#endif
+
 /* for standard C typedefs, NULL, offsetof(), etc. */
 #if defined(LINUX) && defined(__KERNEL__)
 /* compiling the linux kernel (or rather a module) */
 #include <linux/types.h>
 #include <linux/stddef.h>
-#elif defined(KERNEL) && defined(APPLE)
-/* xnu kernel */
+#elif defined(APPLE) && (defined(KERNEL) || TARGET_OS_DRIVERKIT)
+/* xnu kernel or driverkit */
 #include <IOKit/IOTypes.h>
 /* xnu for some reason doesn't typedef ptrdiff_t. To avoid stepping on toes,
  * we'll temporarily re-#define it in case another header sets it */
